@@ -11,7 +11,7 @@ ShellRoot {
         id: panel
 
         // ---- tune these ----
-        property int topOffset: 600          // distance from screen top to the SYSTEM CORE heading
+        readonly property real topOffset: screen ? Math.max(90, Math.min(screen.height * 0.56, screen.height - 220)) : 600
         property bool showBackground: false // true = same translucent rounded card as NOW PLAYING
         property int pad: 18
         // --------------------
@@ -41,7 +41,7 @@ ShellRoot {
         color: "transparent"
         anchors { top: true }
         margins { top: topOffset }
-        implicitWidth: 800
+        implicitWidth: screen ? Math.min(800, screen.width * 0.92) : 800
         implicitHeight: 27 + 8 + 4 * 23 + 4
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Bottom
@@ -57,18 +57,18 @@ ShellRoot {
             property color labelColor: "#E0F7FF"
             property color valueColor: "#00E5FF"
             property color barColor: "#00E5FF"
-            width: 800
+            width: panel.width
             height: 23
 
             Text {
-                x: 245
+                x: row.width * 0.31
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.label
                 color: row.labelColor
                 font.family: "Iceland"; font.pixelSize: 24; font.bold: true
             }
             Text {
-                x: 320
+                x: row.width * 0.40
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.value
                 color: row.valueColor
@@ -76,8 +76,8 @@ ShellRoot {
             }
             Rectangle {
                 visible: row.showBar
-                x: 415
-                width: 140; height: 6
+                x: row.width * 0.52
+                width: row.width * 0.18; height: 6
                 anchors.verticalCenter: parent.verticalCenter
                 color: "transparent"
                 border.width: 1

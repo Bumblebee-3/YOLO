@@ -46,6 +46,8 @@ Static images live in `themes/oledwall/` and animated media in `themes/animwall/
 
 The installer supplies a separate `yolo` SDDM theme, a Qt virtual keyboard, the Tahoe battery QML module and a YOLO session entry. Existing high-priority `/etc/sddm.conf` theme or input-method keys are updated after backup. The publisher accepts image bytes and a validated palette from the desktop user's narrowly scoped sudo rule. Its output directory and filenames are fixed. The Zenbook-only power helper has its own sudo rule. Bootloader and kernel settings are outside the default manifest.
 
+The bundled SwayOSD source is the `Bumblebee-3/SwayOSD` fork at commit `95c6fe3`. The installer builds it into `/usr/local` after the package dependencies are installed, then enables its user service. Brightness bindings use SwayOSD's wildcard backlight selection, so they work with different laptop backlight names. SwayOSD requires a network connection the first time it builds its Rust dependencies.
+
 The TahoeBattery QML module and Circle utility are the x86-64 binaries from the reference system. Greeter testing used SDDM 0.21 and Qt 6.12. The imported greeter theme includes its upstream license. The personal wallpaper and font collection came from the reference machine. Check redistribution rights before publishing those assets. Set up Git LFS before the first commit if hosting this collection on GitHub; individual GIFs exceed GitHub's ordinary file size limit.
 
 ## Dell smoke test

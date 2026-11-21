@@ -11,11 +11,12 @@ ShellRoot {
         id: card
 
         // ---- tune these ----
-        property int topOffset: 665     // distance from screen top to the NOW PLAYING heading
-        property int leftInset: 275     // same x as the SYSTEM CORE columns in conky
-        property int coverSize: 64
-        property int pad: 12
-        property int textWidth: 160     // width of the text column (progress bar spans it too)
+        readonly property real topOffset: screen ? Math.max(90, Math.min(screen.height * 0.62, screen.height - 150)) : 665
+        readonly property real leftInset: screen ? Math.max(16, Math.min(screen.width * 0.34, screen.width - 360)) : 275
+        readonly property real uiScale: screen ? Math.max(0.72, Math.min(1.15, screen.height / 1080)) : 1
+        readonly property real coverSize: 64 * uiScale
+        readonly property real pad: 12 * uiScale
+        readonly property real textWidth: 160 * uiScale
         // --------------------
 
         // prefer the player that is currently playing, else the first one
@@ -47,7 +48,7 @@ ShellRoot {
         color: "transparent"
         anchors { top: true }
         margins { top: topOffset }
-        implicitWidth: 800
+        implicitWidth: screen ? Math.min(800, screen.width * 0.92) : 800
         implicitHeight: pad + coverSize + pad
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Bottom

@@ -31,7 +31,14 @@ waybar
 quickshell
 cava
 swaync
-swayosd
+# YOLO builds the pinned Bumblebee-3 SwayOSD source in vendor/swayosd.
+meson
+rust
+cargo
+gtk4-layer-shell
+libpulse
+libinput
+libevdev
 rofi
 rofimoji
 awww

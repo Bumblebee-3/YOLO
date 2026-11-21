@@ -28,3 +28,16 @@ install_packages() {
     fi
     "$helper" -S --needed "${community[@]}"
 }
+
+build_yolo_swayosd() {
+    local build_dir="$repo/vendor/swayosd/build"
+    if ((plan)) || [[ -n $stage ]]; then
+        return
+    fi
+    [[ -f "$repo/vendor/swayosd/meson.build" ]] || die "Bundled SwayOSD source is missing"
+    command -v meson >/dev/null || die "meson is required to build bundled SwayOSD"
+    meson setup "$build_dir" "$repo/vendor/swayosd" --buildtype release --prefix /usr/local
+    meson compile -C "$build_dir"
+    sudo meson install -C "$build_dir"
+    sudo systemctl daemon-reload
+}
