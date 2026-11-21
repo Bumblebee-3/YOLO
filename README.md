@@ -48,6 +48,8 @@ The installer supplies a separate `yolo` SDDM theme, a Qt virtual keyboard, the 
 
 The bundled SwayOSD source is the `Bumblebee-3/SwayOSD` fork at commit `95c6fe3`. The installer builds it into `/usr/local` after the package dependencies are installed, then enables its user service. Brightness bindings use SwayOSD's wildcard backlight selection, so they work with different laptop backlight names. SwayOSD requires a network connection the first time it builds its Rust dependencies.
 
+QuickShell's System Core and Now Playing panels derive their position, width, and scale from the active monitor. The SDDM theme leaves screen dimensions empty so the greeter uses the actual display size. If an older deployed copy still has fixed `ScreenWidth` or `ScreenHeight` values, run `./install.sh -r` to replace it.
+
 The TahoeBattery QML module and Circle utility are the x86-64 binaries from the reference system. Greeter testing used SDDM 0.21 and Qt 6.12. The imported greeter theme includes its upstream license. The personal wallpaper and font collection came from the reference machine. Check redistribution rights before publishing those assets. Set up Git LFS before the first commit if hosting this collection on GitHub; individual GIFs exceed GitHub's ordinary file size limit.
 
 ## Dell smoke test

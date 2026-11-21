@@ -25,6 +25,7 @@ if (( ! plan )) && [[ -z $stage ]]; then
     flock -n 9 || die 'Another YOLO installation for this user is running'
 fi
 if (( ! restore_only )); then install_packages; fi
+if (( ! restore_only )); then build_yolo_swayosd; fi
 restore_config
 run_hooks
 log "Backup ID for replaced files: $run"
