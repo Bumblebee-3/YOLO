@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""dynsky-run <DIR | --stop>
+
+Keeps the wallpaper in sync with the sun: sets the right keyframe now, then crossfades to the
+next one when its time comes. DIR is the folder made by dynsky-build. Only one instance runs."""
+import os, sys, json, time, signal, subprocess, datetime
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import dynsky
+
+PID = os.path.expanduser("~/.cache/dynsky.pid")
+FADE = "25"          # seconds of crossfade between keyframes
+
+def stop_other():
+    try:
+        pid = int(open(PID).read())
+        if pid != os.getpid():
+            os.kill(pid, signal.SIGTERM)
+            time.sleep(0.2)
+    except (FileNotFoundError, ProcessLookupError, ValueError):
+        pass
+
+def set_wall(path, long_fade):
+    # long crossfade between keyframes while running; short one for the very first set (login / switch)
+    args = ["awww", "img", path, "--transition-type", "fade",
+            "--transition-duration", FADE if long_fade else "1.5"]
+    subprocess.run(args, check=False)
+    pal = os.path.expanduser("~/.local/bin/wallpalette")
+    if os.path.exists(pal):
+        subprocess.Popen([pal, path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit(__doc__)
+    if sys.argv[1] == "--stop":
+        stop_other(); sys.exit(0)
+    d = os.path.abspath(sys.argv[1])
+    sched = json.load(open(os.path.join(d, "schedule.json")))
+    stop_other()
+    os.makedirs(os.path.dirname(PID), exist_ok=True)
+    open(PID, "w").write(str(os.getpid()))
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+
+    tz = datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600
+    current, first = None, True
+    while True:
+        now = datetime.datetime.now()
+        ev = dynsky.sun_events(now.date(), sched["lat"], sched["lon"], tz)
+        times = sorted(((ev[k["anchor"]] + k["offset"]) % 1440, k["file"]) for k in sched["keyframes"])
+        m = now.hour * 60 + now.minute
+        past = [t for t in times if t[0] <= m]
+        want = (past[-1] if past else times[-1])[1]
+        if want != current:
+            set_wall(os.path.join(d, want), long_fade=not first)
+            current, first = want, False
+        time.sleep(30)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,86 @@
+{
+ "lat": 12.97,
+ "lon": 77.59,
+ "keyframes": [
+  {
+   "file": "00-night-a.jpg",
+   "anchor": "MID",
+   "offset": 0
+  },
+  {
+   "file": "01-night-b.jpg",
+   "anchor": "SR",
+   "offset": -170
+  },
+  {
+   "file": "02-predawn.jpg",
+   "anchor": "SR",
+   "offset": -75
+  },
+  {
+   "file": "03-blue-am.jpg",
+   "anchor": "SR",
+   "offset": -35
+  },
+  {
+   "file": "04-pre-rise.jpg",
+   "anchor": "SR",
+   "offset": -8
+  },
+  {
+   "file": "05-sunrise.jpg",
+   "anchor": "SR",
+   "offset": 12
+  },
+  {
+   "file": "06-morning.jpg",
+   "anchor": "SR",
+   "offset": 60
+  },
+  {
+   "file": "07-forenoon.jpg",
+   "anchor": "SR",
+   "offset": 170
+  },
+  {
+   "file": "08-noon.jpg",
+   "anchor": "NOON",
+   "offset": 0
+  },
+  {
+   "file": "09-afternoon.jpg",
+   "anchor": "SS",
+   "offset": -170
+  },
+  {
+   "file": "10-late-pm.jpg",
+   "anchor": "SS",
+   "offset": -75
+  },
+  {
+   "file": "11-golden.jpg",
+   "anchor": "SS",
+   "offset": -35
+  },
+  {
+   "file": "12-sunset.jpg",
+   "anchor": "SS",
+   "offset": -8
+  },
+  {
+   "file": "13-dusk-a.jpg",
+   "anchor": "SS",
+   "offset": 12
+  },
+  {
+   "file": "14-dusk-b.jpg",
+   "anchor": "SS",
+   "offset": 45
+  },
+  {
+   "file": "15-night-c.jpg",
+   "anchor": "SS",
+   "offset": 110
+  }
+ ]
+}

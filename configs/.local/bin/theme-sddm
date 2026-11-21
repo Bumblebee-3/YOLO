@@ -1,0 +1,37 @@
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+WALLPAPER="${1:?Usage: theme-sddm /path/to/wallpaper}"
+
+PALETTE="$HOME/.cache/wallpalette/colors.json"
+STAGING="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/theme-sddm"
+
+[[ -f "$WALLPAPER" ]] || exit 1
+[[ -f "$PALETTE" ]] || exit 1
+
+mkdir -p "$STAGING"
+chmod 700 "$STAGING"
+
+# Keep GIFs animated; convert other formats to PNG.
+case "${WALLPAPER,,}" in
+    *.gif)
+        cp -- "$WALLPAPER" "$STAGING/wallpaper.tmp.gif"
+        mv -f "$STAGING/wallpaper.tmp.gif" "$STAGING/wallpaper.gif"
+        rm -f "$STAGING/wallpaper.png"
+        ;;
+    *)
+        ffmpeg -hide_banner -loglevel error -y \
+            -i "$WALLPAPER" \
+            -frames:v 1 \
+            "$STAGING/wallpaper.tmp.png"
+
+        mv -f "$STAGING/wallpaper.tmp.png" "$STAGING/wallpaper.png"
+        rm -f "$STAGING/wallpaper.gif"
+        ;;
+esac
+
+wall="$STAGING/wallpaper.png"
+[[ -f "$wall" ]] || wall="$STAGING/wallpaper.gif"
+{ jq -ce '{fg,accent,highlight}' "$PALETTE" && cat -- "$wall"; } |
+    sudo -n /usr/local/libexec/yolo-sddm-publish

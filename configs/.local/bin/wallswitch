@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# ~/.local/bin/wallswitch   (symlinked as wallswitch-static / wallswitch-animated)
+
+CACHE="$HOME/.cache/wallswitch"
+THEME="$HOME/.config/rofi/application-manager.rasi"
+BIN="$HOME/.local/bin"
+mkdir -p "$CACHE"
+
+case "$(basename "$0")" in
+
+# ── Launcher: ./wallswitch [static|animated] ───────────────────
+wallswitch)
+    GRID='
+    window       { width: 66%; height: 76%; }
+    entry        { placeholder: "search wallpapers..."; }
+    listview     { columns: 4; lines: 3; flow: horizontal; spacing: 8px; padding: 10px; fixed-height: false; }
+    element      { orientation: vertical; padding: 10px; spacing: 8px; border: 1px; }
+    element-icon { size: 150px; horizontal-align: 0.5; }
+    element-text { font: "JetBrains Mono 9"; horizontal-align: 0.5; }
+    '
+    exec rofi -modes "static:$BIN/wallswitch-static,animated:$BIN/wallswitch-animated" \
+        -show "${1:-static}" -show-icons -no-custom -p "wallpaper" \
+        -theme "$THEME" -theme-str "$GRID"
+    ;;
+
+# ── Script modes (called by rofi) ──────────────────────────────
+wallswitch-static|wallswitch-animated)
+    if [[ $(basename "$0") == wallswitch-static ]]; then
+        DIR="$HOME/oledwall"
+        EXT=(-iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp')
+    else
+        DIR="$HOME/animwall"
+        EXT=(-iname '*.gif')
+    fi
+
+    # Rofi calls the script again with the chosen entry; ROFI_INFO holds the full path
+
+if [[ -n $1 ]]; then
+    if [[ -n $ROFI_INFO ]]; then
+        dyn="${ROFI_INFO%.*}.dynsky"
+
+        if [[ -f "$dyn/schedule.json" ]]; then
+            # Dynamic time-of-day wallpaper
+            setsid -f "$BIN/dynsky-run" "$dyn" >/dev/null 2>&1
+        else
+            # Stop dynamic wallpaper scheduler
+            "$BIN/dynsky-run" --stop 2>/dev/null
+
+            # Apply normal wallpaper
+            awww img "$ROFI_INFO" >/dev/null 2>&1
+        fi
+
+        printf '%s' "$ROFI_INFO" > "$CACHE/last"
+
+        (
+            # Dynamic wallpapers manage their own palette updates
+            if [[ ! -f "$dyn/schedule.json" ]]; then
+                "$BIN/wallpalette" "$ROFI_INFO" || exit 1
+            fi
+
+            mkdir -p "$HOME/.cache/wallpalette"
+            printf '%s\n' "$ROFI_INFO" > \
+                "$HOME/.cache/wallpalette/current_wallpaper"
+
+            LOCK_WALL="$ROFI_INFO"
+
+            case "${ROFI_INFO,,}" in
+                *.gif|*.webp|*.apng|*.mp4|*.webm|*.mkv)
+                    LOCK_WALL="$HOME/.cache/wallpalette/hyprlock-wall.png"
+                    ffmpeg -y -loglevel error \
+                        -i "$ROFI_INFO" -frames:v 1 \
+                        "$LOCK_WALL" || exit 1
+                    ;;
+            esac
+
+            WALLPAPER="$LOCK_WALL" \
+                "$HOME/.local/bin/theme-hyprlock"
+
+            "$HOME/.local/bin/theme-kitty"
+            "$HOME/.local/bin/theme-apps"
+            "$HOME/.local/bin/theme-kde"
+            "$HOME/.local/bin/theme-sddm" "$ROFI_INFO"
+            command -v pywalfox >/dev/null && "$HOME/.local/bin/theme-firefox"
+
+        ) >/dev/null 2>&1 &
+    fi
+    exit 0
+fi
+
+    while IFS= read -r -d '' f; do
+        hash=$(printf '%s' "$f" | md5sum | cut -d' ' -f1)
+        thumb="$CACHE/$hash.png"
+        if [[ ! -f $thumb || $f -nt $thumb ]]; then
+            magick "${f}[0]" -thumbnail 400x400^ -gravity center -extent 400x400 "$thumb" 2>/dev/null
+        fi
+        printf '%s\0icon\x1f%s\x1finfo\x1f%s\n' "$(basename "$f")" "$thumb" "$f"
+    done < <(find "$DIR" -maxdepth 1 -type f \( "${EXT[@]}" \) -print0 | sort -z)
+    ;;
+esac

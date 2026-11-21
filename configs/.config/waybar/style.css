@@ -1,0 +1,220 @@
+/* ---- Waybar Style - Cyberpunk Dark (wallpaper-driven colours) ---- */
+/* colors.css is written by ~/.local/bin/wallpalette on every wallpaper change */
+@import "colors.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Fira Code", monospace;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+/* ---- fixed colours (not wallpaper-driven) ---- */
+#custom-osk {
+    color: @wp_fg;
+    padding: 0 12px;
+    font-size: 18px;
+}
+/* ---- Lid Sleep Toggle ---- */
+
+#custom-lidtoggle {
+    padding: 0 12px;
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+#custom-lidtoggle.enabled {
+    color: @wp_accent;
+    background: alpha(@wp_accent, 0.10);
+}
+
+#custom-lidtoggle.disabled {
+    color: @wp_fg;
+}
+
+#custom-lidtoggle:hover {
+    color: @wp_highlight;
+    background: alpha(@wp_highlight, 0.12);
+}
+#custom-osk:hover {
+    color: @wp_accent;
+    background: alpha(@wp_accent, 0.12);
+}
+#custom-powermode {
+    color: #00d2ff;
+    padding: 0 10px;
+}
+#custom-powermode.powersave {
+    color: #64ffc8;
+}
+#custom-powermode.balanced {
+    color: #00d2ff;
+}
+#custom-powermode.performance {
+    color: #ff2d55;
+}
+
+window#waybar {
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Left Modules ---- */
+
+#workspaces button {
+    padding: 0 8px;
+    color: rgba(255, 255, 255, 0.4);
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    color: @wp_accent;
+    border-bottom: 2px solid @wp_accent;
+    background: alpha(@wp_accent, 0.1);
+}
+
+#workspaces button:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#cpu {
+    color: @wp_accent;
+    padding: 0 10px;
+}
+
+#memory {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#temperature {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#temperature.critical {
+    color: #ff2d55;
+    animation: blink 1s linear infinite;
+}
+
+#custom-gputemp {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+/* ---- Center - Clock ---- */
+
+#clock {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 0 16px;
+    background: alpha(@wp_accent, 0.12);
+    border-left: 2px solid @wp_accent;
+    border-right: 2px solid @wp_accent;
+}
+
+/* ---- Right Modules ---- */
+
+#backlight {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#pulseaudio {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#pulseaudio.muted {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#pulseaudio.microphone {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#network {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#network.disconnected {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#bluetooth {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#bluetooth.disabled {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+#custom-swaync {
+    color: @wp_fg;
+    padding: 0 19px;
+}
+
+/* power button stays fixed */
+#custom-power {
+    color: #ff2d55;
+    padding: 0 14px 0 10px;
+    font-size: 16px;
+    margin-right: 2px;
+}
+
+#custom-power:hover {
+    color: #ffffff;
+    background: rgba(255, 45, 85, 0.3);
+}
+
+/* ---- Tooltips ---- */
+
+tooltip {
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid alpha(@wp_accent, 0.4);
+    border-radius: 4px;
+    color: #ffffff;
+}
+
+tooltip label {
+    color: #ffffff;
+}
+
+/* ---- Battery: normal state follows wallpaper, warning/critical stay fixed ---- */
+
+#battery {
+    color: @wp_fg;
+    padding: 0 10px;
+}
+
+#battery.warning {
+    color: #ff9f0a;
+}
+
+#battery.critical {
+    color: #ff2d55;
+    animation: blink 1s linear infinite;
+}
+
+#battery.charging {
+    color: @wp_fg;
+}
+
+/* ---- Animations ---- */
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}

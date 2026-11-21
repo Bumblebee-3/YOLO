@@ -1,0 +1,248 @@
+/**
+ * WEDNESDA — Rofi Theme
+ * Cyberpunk synthwave forest aesthetic
+ * Matches your Hyprland/Waybar setup
+ *
+ * INSTALL:
+ *   mkdir -p ~/.config/rofi/themes
+ *   cp wednesda.rasi ~/.config/rofi/themes/
+ *   rofi -show drun -theme ~/.config/rofi/themes/wednesda.rasi
+ *
+ * OR set as default in ~/.config/rofi/config.rasi:
+ *   @theme "~/.config/rofi/themes/wednesda"
+ */
+
+/* ── Colour Palette ───────────────────────────────────────────── */
+* {
+    /* Backgrounds */
+    bg-deep:    #07080f99;   /* was ee, now ~60% opaque — lets blur show through */
+    bg-panel:   #0d112099;   /* same */
+    bg-input:   #0a0e1c88;
+    bg-hover:       #1a1f3acc;
+    bg-selected:    #0e2a3a;
+    bg-urgent:      #2a0e1a;
+
+    /* Neon accents (pulled from your wallpaper + bar) */
+    cyan:           #00e5ff;
+    cyan-dim:       #00b8d4aa;
+    magenta:        #ff2d78;
+    magenta-dim:    #cc1a5eaa;
+    orange:         #ff6b2b;
+    purple:         #b060ff;
+
+    /* Text */
+    text-bright:    #e8f0ff;
+    text-mid:       #8899bb;
+    text-dim:       #445566;
+    text-selected:  #00e5ff;
+    text-urgent:    #ff2d78;
+
+    /* Borders */
+    border-normal:  #1e3050;
+    border-focused: #00e5ffaa;
+    border-active:  #ff2d78aa;
+
+    /* Global resets */
+    background-color:   transparent;
+    text-color:         @text-mid;
+    border-color:       @border-normal;
+}
+
+/* ── Window ───────────────────────────────────────────────────── */
+window {
+    width:              680px;
+    background-color:   @bg-deep;
+    border:             1px;
+    border-color:       @border-focused;
+    border-radius:      4px;
+    padding:            0px;
+
+}
+
+/* ── Main Layout ──────────────────────────────────────────────── */
+mainbox {
+    background-color:   transparent;
+    spacing:            0px;
+    padding:            0px;
+    children:           [ inputbar, message, listview, mode-switcher ];
+}
+
+/* ── Header / Input Bar ───────────────────────────────────────── */
+inputbar {
+    background-color:   @bg-panel;
+    border:             0px 0px 1px 0px;
+    border-color:       @border-focused;
+    padding:            18px 20px 14px 20px;
+    spacing:            12px;
+    children:           [ prompt, textbox-prompt-colon, entry ];
+}
+
+prompt {
+    background-color:   transparent;
+    text-color:         @cyan;
+    font:               "JetBrains Mono 10";
+    vertical-align:     0.5;
+}
+
+textbox-prompt-colon {
+    background-color:   transparent;
+    text-color:         @magenta;
+    font:               "JetBrains Mono 10";
+    str:                "›";
+    vertical-align:     0.5;
+    margin:             0px -4px 0px 0px;
+}
+
+entry {
+    background-color:   transparent;
+    text-color:         @text-bright;
+    font:               "JetBrains Mono 12";
+    placeholder:        "search applications...";
+    placeholder-color:  @text-dim;
+    cursor:             text;
+    vertical-align:     0.5;
+    expand:             true;
+}
+
+/* ── Message Box (shows when no results) ─────────────────────── */
+message {
+    background-color:   @bg-panel;
+    border:             0px 0px 1px 0px;
+    border-color:       @border-normal;
+    padding:            6px 20px;
+}
+
+textbox {
+    background-color:   transparent;
+    text-color:         @text-dim;
+    font:               "JetBrains Mono 9";
+}
+
+/* ── List View ────────────────────────────────────────────────── */
+listview {
+    background-color:   @bg-panel;
+    padding:            8px 0px;
+    spacing:            0px;
+    lines:              8;
+    columns:            1;
+    fixed-height:       true;
+    scrollbar:          true;
+    cycle:              true;
+    dynamic:            false;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+scrollbar {
+    background-color:   @bg-deep;
+    handle-color:       @cyan-dim;
+    handle-width:       3px;
+    border:             0px 0px 0px 1px;
+    border-color:       @border-normal;
+    width:              6px;
+    padding:            0px;
+}
+
+/* ── Individual Row ───────────────────────────────────────────── */
+element {
+    background-color:   transparent;
+    padding:            10px 20px 10px 20px;
+    spacing:            12px;
+    border:             0px 0px 0px 3px;
+    border-color:       transparent;
+    orientation:        horizontal;
+    children:           [ element-icon, element-text ];
+}
+
+element normal.normal {
+    background-color:   transparent;
+    text-color:         @text-mid;
+    border-color:       transparent;
+}
+
+element normal.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @text-urgent;
+    border-color:       @border-active;
+}
+
+element normal.active {
+    background-color:   @bg-selected;
+    text-color:         @cyan;
+    border-color:       @cyan-dim;
+}
+
+element selected.normal {
+    background-color:   @bg-selected;
+    text-color:         @text-selected;
+    border-color:       @cyan;
+}
+
+element selected.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @magenta;
+    border-color:       @magenta;
+}
+
+element selected.active {
+    background-color:   @bg-selected;
+    text-color:         @purple;
+    border-color:       @purple;
+}
+
+element alternate.normal {
+    background-color:   transparent;
+    text-color:         @text-mid;
+}
+
+element alternate.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @text-urgent;
+}
+
+element alternate.active {
+    background-color:   @bg-selected;
+    text-color:         @cyan;
+}
+
+
+/* ── Icon ─────────────────────────────────────────────────────── */
+element-icon {
+    background-color:   transparent;
+    size:               26px;
+    vertical-align:     0.5;
+}
+
+/* ── App Name Text ────────────────────────────────────────────── */
+element-text {
+    background-color:   transparent;
+    text-color:         inherit;
+    font:               "JetBrains Mono 11";
+    vertical-align:     0.5;
+    highlight:          bold #00e5ff;
+}
+
+/* ── Mode Switcher (drun / run / window tabs) ─────────────────── */
+mode-switcher {
+    background-color:   @bg-deep;
+    border:             1px 0px 0px 0px;
+    border-color:       @border-normal;
+    padding:            8px 20px;
+    spacing:            6px;
+}
+
+button {
+    background-color:   transparent;
+    text-color:         @text-dim;
+    font:               "JetBrains Mono 9";
+    border:             1px;
+    border-color:       @border-normal;
+    border-radius:      2px;
+    padding:            4px 14px;
+}
+
+button.selected {
+    background-color:   @bg-selected;
+    text-color:         @cyan;
+    border-color:       @border-focused;
+}
+

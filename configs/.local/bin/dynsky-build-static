@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""dynsky-build-static <image.png|jpg> [--out DIR] [--lat 12.97 --lon 77.59 --tz H] [--jobs N]
+
+Time-of-day version of the still gas-station wallpaper: 16 full-colour JPEGs
+(sky, clouds, sun, moon, stars and lighting follow the time of day) + schedule.json.
+Default output folder: <image without extension>.dynsky/  -> used by dynsky-run."""
+import os, sys, json, argparse, datetime, time
+import numpy as np, cv2
+from PIL import Image
+from multiprocessing import get_context
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import dynsky, dynsky_static as ds
+
+CTX = {}
+
+def render_one(job):
+    idx, name, anchor, off = job
+    c = CTX
+    mins = (c["ev"][anchor] + off) % 1440
+    dt = datetime.datetime(c["date"].year, c["date"].month, c["date"].day, mins // 60, mins % 60)
+    e, ha = dynsky.sun_state(dt, c["lat"], c["lon"], c["tz"])
+    out = ds.render(c["img"], c["masks"], c["emis"], e, ha, dynsky.moon_phase(dt), c["stars"], c["grain"])
+    fn = f"{idx:02d}-{name}.jpg"
+    Image.fromarray(cv2.cvtColor(out, cv2.COLOR_BGR2RGB)).save(os.path.join(c["outdir"], fn),
+                                                              quality=95, subsampling=0, optimize=True)
+    return idx, fn, mins, e
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("image"); ap.add_argument("--out")
+    ap.add_argument("--lat", type=float, default=12.97); ap.add_argument("--lon", type=float, default=77.59)
+    ap.add_argument("--tz", type=float, default=None)
+    ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) // 2))
+    a = ap.parse_args()
+
+    src = os.path.abspath(a.image)
+    outdir = a.out or os.path.splitext(src)[0] + ".dynsky"
+    os.makedirs(outdir, exist_ok=True)
+    tz = a.tz if a.tz is not None else datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600
+    date = datetime.date.today()
+
+    im = cv2.imread(src)
+    if im is None:
+        sys.exit("cannot read " + src)
+    h0, w0 = im.shape[:2]
+    if abs(w0 / h0 - ds.W / ds.H) > 0.02:
+        print(f"warning: aspect {w0}x{h0} differs from the 4680x3024 wallpaper this renderer was tuned for; "
+              "the sky mask may be off", file=sys.stderr)
+    im = cv2.resize(im, (ds.W, ds.H), interpolation=cv2.INTER_AREA)
+    CTX.update(img=im, masks=ds.build_masks(im), emis=ds.build_emissive(im),
+               stars=dynsky.make_stars(count=1400),
+               grain=np.random.default_rng(3).normal(0, 0.005, (ds.H, ds.W, 3)).astype(np.float32),
+               ev=dynsky.sun_events(date, a.lat, a.lon, tz), date=date, lat=a.lat, lon=a.lon, tz=tz, outdir=outdir)
+    ev = CTX["ev"]
+    print(f"rendering {len(ds.KEYFRAMES)} keyframes (sunrise {ev['SR']//60:02d}:{ev['SR']%60:02d}, "
+          f"sunset {ev['SS']//60:02d}:{ev['SS']%60:02d}) with {a.jobs} workers", flush=True)
+    jobs = [(i, *k) for i, k in enumerate(ds.KEYFRAMES)]
+    t0 = time.time()
+    with get_context("fork").Pool(a.jobs) as pool:
+        for idx, fn, mins, e in pool.imap_unordered(render_one, jobs):
+            print(f"  [{idx+1:2d}/{len(jobs)}] {fn}  ({mins//60:02d}:{mins%60:02d}, sun {e:+.0f} deg)  {time.time()-t0:.0f}s", flush=True)
+    sched = {"lat": a.lat, "lon": a.lon,
+             "keyframes": [{"file": f"{i:02d}-{nm}.jpg", "anchor": an, "offset": off}
+                           for i, (nm, an, off) in enumerate(ds.KEYFRAMES)]}
+    with open(os.path.join(outdir, "schedule.json"), "w") as f:
+        json.dump(sched, f, indent=1)
+    print("done ->", outdir)
+
+if __name__ == "__main__":
+    main()

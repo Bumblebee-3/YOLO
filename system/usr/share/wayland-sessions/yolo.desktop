@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=YOLO (Hyprland)
+Comment=Your Own Linux Overhaul
+Exec=/usr/local/bin/yolo-session
+Type=Application
+DesktopNames=Hyprland

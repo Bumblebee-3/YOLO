@@ -1,0 +1,8 @@
+# Build the touchscreen and overview plugins
+base-devel
+git
+cmake
+meson
+ninja
+cpio
+glm

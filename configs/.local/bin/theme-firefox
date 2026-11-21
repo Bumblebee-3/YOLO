@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+import colorsys
+import json
+import subprocess
+from pathlib import Path
+
+HOME = Path.home()
+SOURCE = HOME / ".cache/wallpalette/colors.json"
+DEST = HOME / ".cache/wal/colors.json"
+
+pal = json.loads(SOURCE.read_text())
+
+def dark(hexcolor, value):
+    h = hexcolor.lstrip("#")
+    r, g, b = [int(h[i:i+2], 16) / 255 for i in (0, 2, 4)]
+    hue, _, _ = colorsys.rgb_to_hsv(r, g, b)
+    rgb = colorsys.hsv_to_rgb(hue, 0.65, value)
+    return "#{:02x}{:02x}{:02x}".format(
+        *(round(c * 255) for c in rgb)
+    )
+
+accent = pal["accent"]
+secondary = pal["highlight"]
+fg = pal["fg"]
+bg = dark(accent, 0.09)
+
+colors = {
+    "color0": bg,
+    "color1": accent,
+    "color2": pal["accent2"],
+    "color3": secondary,
+    "color4": accent,
+    "color5": secondary,
+    "color6": pal["warn"],
+    "color7": fg,
+    "color8": dark(accent, 0.18),
+    "color9": accent,
+    "color10": pal["accent2"],
+    "color11": secondary,
+    "color12": accent,
+    "color13": secondary,
+    "color14": pal["warn"],
+    "color15": fg,
+}
+
+data = {
+    "wallpaper": str(
+        HOME / ".cache/wallpalette/current_wallpaper"
+    ),
+    "alpha": "100",
+    "special": {
+        "background": bg,
+        "foreground": fg,
+        "cursor": accent,
+    },
+    "colors": colors,
+}
+
+DEST.parent.mkdir(parents=True, exist_ok=True)
+DEST.write_text(json.dumps(data, indent=2) + "\n")
+
+# Compatibility with tools expecting ~/.cache/wal/colors
+(DEST.parent / "colors").write_text(
+    "\n".join(colors[f"color{i}"] for i in range(16)) + "\n"
+)
+
+subprocess.run(
+    ["pywalfox", "update"],
+    check=True
+)
+
+print("Firefox wallpaper theme updated.")

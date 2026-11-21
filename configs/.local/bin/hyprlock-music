@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+case "$1" in
+    title)
+        playerctl metadata --format '{{title}}' 2>/dev/null | cut -c1-50
+        ;;
+    artist)
+        playerctl metadata --format '{{artist}}' 2>/dev/null | cut -c1-50
+        ;;
+    status)
+    case "$(playerctl status 2>/dev/null)" in
+        Playing) echo "󰏤" ;;
+        Paused)  echo "󰐊" ;;
+        *)       echo "󰐊" ;;
+    esac
+    ;;
+esac

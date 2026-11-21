@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+for bat in /sys/class/power_supply/BAT*; do
+    [[ -f "$bat/capacity" ]] || continue
+
+    capacity=$(<"$bat/capacity")
+    status=$(<"$bat/status")
+
+    if [[ "$status" == "Charging" ]]; then
+        icon="󰂄"
+    elif (( capacity >= 80 )); then
+        icon="󰁹"
+    elif (( capacity >= 50 )); then
+        icon="󰂀"
+    elif (( capacity >= 20 )); then
+        icon="󰁾"
+    else
+        icon="󰁺"
+    fi
+
+    printf '%s  %s%%\n' "$icon" "$capacity"
+    exit 0
+done

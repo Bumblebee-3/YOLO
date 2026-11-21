@@ -1,0 +1,209 @@
+
+/* ── Colour Palette (shared with wednesda.rasi) ───────────────── */
+* {
+    bg-deep:        #07080fcc;
+    bg-panel:       #0d1120bb;
+    bg-input:       #0a0e1ccc;
+    bg-selected:    #0e2a3aee;
+    bg-urgent:      #2a0e1a;
+
+    cyan:           #00e5ff;
+    cyan-dim:       #00b8d4aa;
+    magenta:        #ff2d78;
+    purple:         #b060ff;
+    orange:         #ff6b2b;
+
+    text-bright:    #e8f0ff;
+    text-mid:       #8899bb;
+    text-dim:       #445566;
+    text-selected:  #00e5ff;
+    text-urgent:    #ff2d78;
+
+    border-normal:  #1e3050;
+    border-focused: #00e5ffaa;
+    border-active:  #ff2d78aa;
+
+    background-color:   transparent;
+    text-color:         @text-mid;
+    border-color:       @border-normal;
+}
+
+/* ── Window ───────────────────────────────────────────────────── */
+window {
+    width:              700px;
+    background-color:   @bg-deep;
+    border:             1px;
+    border-color:       @border-focused;
+    border-radius:      4px;
+    padding:            0px;
+}
+
+/* ── Main Layout ──────────────────────────────────────────────── */
+mainbox {
+    background-color:   transparent;
+    spacing:            0px;
+    padding:            0px;
+    children:           [ inputbar, message, listview ];
+}
+
+/* ── Input Bar ────────────────────────────────────────────────── */
+inputbar {
+    background-color:   @bg-panel;
+    border:             0px 0px 1px 0px;
+    border-color:       @border-focused;
+    padding:            14px 18px 11px 18px;
+    spacing:            10px;
+    children:           [ prompt, textbox-prompt-colon, entry, case-indicator ];
+}
+
+prompt {
+    background-color:   transparent;
+    text-color:         @magenta;
+    font:               "JetBrains Mono 13";
+    vertical-align:     0.5;
+}
+
+textbox-prompt-colon {
+    background-color:   transparent;
+    text-color:         @cyan;
+    font:               "JetBrains Mono 10";
+    str:                "›";
+    vertical-align:     0.5;
+    margin:             0px -2px 0px 0px;
+}
+
+entry {
+    background-color:   transparent;
+    text-color:         @text-bright;
+    font:               "JetBrains Mono 12";
+    placeholder:        "search emoji...";
+    placeholder-color:  @text-dim;
+    cursor:             text;
+    vertical-align:     0.5;
+    expand:             true;
+}
+
+case-indicator {
+    background-color:   transparent;
+    text-color:         @text-dim;
+    font:               "JetBrains Mono 9";
+    vertical-align:     0.5;
+}
+
+/* ── Message Box ──────────────────────────────────────────────── */
+message {
+    background-color:   @bg-panel;
+    border:             0px 0px 1px 0px;
+    border-color:       @border-normal;
+    padding:            4px 18px;
+}
+
+textbox {
+    background-color:   transparent;
+    text-color:         @text-dim;
+    font:               "JetBrains Mono 9";
+}
+
+/* ── List View — grid of emojis ───────────────────────────────── */
+listview {
+    background-color:   @bg-panel;
+    padding:            12px 10px;
+    spacing:            6px;
+    lines:              4;
+    columns:            10;
+    fixed-height:       true;
+    fixed-columns:      true;
+    scrollbar:          true;
+    cycle:              true;
+    dynamic:            false;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+scrollbar {
+    background-color:   @bg-deep;
+    handle-color:       @cyan-dim;
+    handle-width:       3px;
+    border:             0px 0px 0px 1px;
+    border-color:       @border-normal;
+    width:              5px;
+    padding:            0px;
+}
+
+/* ── Emoji Cell ───────────────────────────────────────────────── */
+element {
+    background-color:   transparent;
+    padding:            42px 0px;
+    spacing:            0px;
+    border:             1px;
+    border-color:       transparent;
+    border-radius:      3px;
+    orientation:        vertical;
+    children:           [ element-text ];
+}
+
+element normal.normal {
+    background-color:   transparent;
+    text-color:         @text-bright;
+    border-color:       transparent;
+}
+
+element normal.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @text-urgent;
+    border-color:       @border-active;
+}
+
+element normal.active {
+    background-color:   @bg-selected;
+    text-color:         @cyan;
+    border-color:       @cyan-dim;
+}
+
+element selected.normal {
+    background-color:   @bg-selected;
+    text-color:         @text-selected;
+    border-color:       @cyan;
+}
+
+element selected.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @magenta;
+    border-color:       @magenta;
+}
+
+element selected.active {
+    background-color:   @bg-selected;
+    text-color:         @purple;
+    border-color:       @purple;
+}
+
+element alternate.normal {
+    background-color:   transparent;
+    text-color:         @text-bright;
+    border-color:       transparent;
+}
+
+element alternate.urgent {
+    background-color:   @bg-urgent;
+    text-color:         @text-urgent;
+}
+
+element alternate.active {
+    background-color:   @bg-selected;
+    text-color:         @cyan;
+}
+
+/* ── Emoji Glyph ──────────────────────────────────────────────── */
+element-icon {
+    background-color:   transparent;
+    size:               0px;
+}
+
+element-text {
+    background-color:   transparent;
+    text-color:         inherit;
+    font:               "Noto Color Emoji 22";
+    vertical-align:     0.5;
+    horizontal-align:   0.5;
+    highlight:          none;
+}

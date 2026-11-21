@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Run in a Hyprland session after installing the touch tier.
+set -euo pipefail
+hyprctl version >/dev/null
+hyprpm update
+enable_plugin() {
+    local name=$1 owner=$2 url=$3 revision=$4 list
+    list=$(hyprpm list)
+    if [[ $list != *"Repository $name (by $owner)"* ]]; then
+        if [[ $list == *"Repository $name (by "* ]]; then
+            echo "Another $name repository is registered. Review hyprpm list before switching to $owner." >&2
+            return 1
+        fi
+        hyprpm add "$url" "$revision"
+    fi
+    hyprpm enable "$name"
+}
+enable_plugin hyprgrass Bumblebee-3 https://github.com/Bumblebee-3/hyprgrass 3b311c0e694b299844b34ef7935b5aa08772cd45
+enable_plugin Hyprspace KZDKM https://github.com/KZDKM/Hyprspace 8345bf6f623d486ca3f87f416ccf1412416eef08
+hyprpm reload
+hyprctl reload

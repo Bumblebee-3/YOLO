@@ -1,0 +1,34 @@
+#!/bin/bash
+# Hide KDE Connect's idle placeholder player in the swaync media widget,
+# and show it again as soon as the phone is playing real music.
+#
+# How: swaync's mpris "blacklist" can't be conditional, so this watches the
+# KDE Connect player and rewrites the blacklist + reloads swaync when it changes.
+
+CFG="$HOME/.config/swaync/config.json"
+PLACEHOLDER="KDE Connect"          # title shown while the phone is idle
+state=""
+
+apply() {                           # apply hide|show
+    [ "$1" = "$state" ] && return
+    state="$1"
+    if [ "$1" = hide ]; then bl='["kdeconnect"]'; else bl='[]'; fi
+    tmp=$(mktemp)
+    if jq --argjson bl "$bl" '.["widget-config"].mpris.blacklist = $bl' "$CFG" > "$tmp"; then
+        cat "$tmp" > "$CFG"         # write in place so symlinked configs keep working
+        swaync-client -R >/dev/null 2>&1
+    fi
+    rm -f "$tmp"
+}
+
+cp -n "$CFG" "$CFG.kdeconnect-filter.bak" 2>/dev/null
+
+# prints the current state once, then again on every change
+playerctl -p kdeconnect --follow metadata --format '{{status}}|{{title}}' 2>/dev/null |
+while IFS='|' read -r status title; do
+    if [ -z "$title" ] || [ "$title" = "$PLACEHOLDER" ] || [ "$status" = "Stopped" ]; then
+        apply hide
+    else
+        apply show
+    fi
+done

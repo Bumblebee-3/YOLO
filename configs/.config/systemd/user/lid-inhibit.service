@@ -1,0 +1,9 @@
+[Unit]
+Description=Prevent systemd-logind suspension on lid close
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/systemd-inhibit --what=handle-lid-switch --mode=block --who=lidtoggle --why="Keep laptop running with lid closed" /usr/bin/sleep infinity
+
+[Install]
+WantedBy=default.target

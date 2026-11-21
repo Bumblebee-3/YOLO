@@ -1,0 +1,629 @@
+#!/usr/bin/env python3
+"""wallpalette <image>  -> palette JSON for Quickshell + regenerated conky.conf"""
+import sys, os, json, math, colorsys, subprocess
+
+HOME  = os.path.expanduser("~")
+OUT   = f"{HOME}/.cache/wallpalette/colors.json"
+TMPL  = f"{HOME}/.config/conky/conky.conf.tmpl"
+CONKY = f"{HOME}/.config/conky/conky.conf"
+WAYBAR_DIR = f"{HOME}/.config/waybar"
+DEFAULT = dict(fg="#E0F7FF", accent="#00E5FF", accent2="#00D2C8",
+               warn="#ee4b30", highlight="#fa6ae1")
+
+def hexc(h, s, v):
+    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
+    return "#%02x%02x%02x" % (round(r * 255), round(g * 255), round(b * 255))
+
+def hue_dist(a, b):
+    d = abs(a - b) % 1.0
+    return min(d, 1.0 - d)
+
+def dominant_hues(img):
+    raw = subprocess.run(["magick", img + "[0]", "-resize", "64x64!", "-depth", "8", "rgb:-"],
+                         capture_output=True, check=True).stdout
+    bins = [[0.0, 0.0, 0.0] for _ in range(24)]          # weight, sin, cos
+    for i in range(0, len(raw) - 2, 3):
+        h, s, v = colorsys.rgb_to_hsv(raw[i] / 255, raw[i + 1] / 255, raw[i + 2] / 255)
+        if s < 0.25 or v < 0.2:                            # ignore greys and near-black
+            continue
+        w = s * v
+        k = int(h * 24) % 24
+        bins[k][0] += w
+        bins[k][1] += w * math.sin(2 * math.pi * h)
+        bins[k][2] += w * math.cos(2 * math.pi * h)
+    picks = []
+    for k in sorted(range(24), key=lambda k: -bins[k][0]):
+        w, sn, cs = bins[k]
+        if w <= 0:
+            break
+        h = (math.atan2(sn, cs) / (2 * math.pi)) % 1.0
+        if all(hue_dist(h, p) >= 0.12 for p in picks):     # keep roles visibly different
+            picks.append(h)
+        if len(picks) == 3:
+            break
+    return picks
+
+def build(picks):
+    if not picks:
+        return dict(DEFAULT)
+    for off in (0.5, 0.33):                                # fill missing roles
+        if len(picks) < 3:
+            picks.append((picks[0] + off) % 1.0)
+    a, hl, wn = picks
+    return dict(
+        fg=hexc(a, 0.08, 1.0),                             # near-white, tinted by accent
+        accent=hexc(a, 0.95, 1.0),
+        accent2=hexc(a + 0.04, 0.90, 0.82),
+        warn=hexc(wn, 0.80, 0.93),
+        highlight=hexc(hl, 0.60, 1.0),
+    )
+
+def rgba(hexstr, alpha="ff"):
+    return f"rgba({hexstr.lstrip('#')}{alpha})"
+
+def apply_borders(pal):
+    # Active: vibrant wallpaper-derived gradient
+    active1 = rgba(pal["accent"])
+    active2 = rgba(pal["highlight"])
+
+    # Inactive: darker and less saturated wallpaper colors
+    a = colorsys.rgb_to_hsv(
+        *[int(pal["accent"][i:i+2], 16) / 255 for i in (1, 3, 5)]
+    )
+    h = colorsys.rgb_to_hsv(
+        *[int(pal["highlight"][i:i+2], 16) / 255 for i in (1, 3, 5)]
+    )
+
+    inactive1 = rgba(hexc(a[0], 0.45, 0.18))
+    inactive2 = rgba(hexc(h[0], 0.35, 0.10))
+
+    colors = {
+        "active": [active1, active2],
+        "inactive": [inactive1, inactive2],
+    }
+
+    # Save for Hyprland startup/reload
+    path = f"{HOME}/.cache/wallpalette/borders.lua"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    with open(path, "w") as f:
+        f.write("return " + json.dumps(colors).replace(
+            '"active":', 'active ='
+        ).replace(
+            '"inactive":', 'inactive ='
+        ).replace("[", "{").replace("]", "}") + "\n")
+
+    # Apply live
+    for name, values in (
+        ("general:col.active_border", colors["active"]),
+        ("general:col.inactive_border", colors["inactive"]),
+        ("group:col.border_active", colors["active"]),
+        ("group:col.border_inactive", colors["inactive"]),
+    ):
+        subprocess.run(
+            ["hyprctl", "keyword", name, " ".join(values) + " 90deg"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False
+        )
+
+
+
+def update_fastfetch(palette):
+    """Generate compact Fastfetch config with wallpaper colors."""
+    import json
+    import os
+
+    generated = f"{HOME}/.config/fastfetch/wallpalette.jsonc"
+
+    config = {
+        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+        "logo": {
+            "type": "builtin",
+            "source": "arch",
+            "color": {
+                "1": palette["accent"],
+                "2": palette["highlight"]
+            }
+        },
+        "display": {
+            "separator": " ",
+            "key": {
+                "width": 12
+            },
+            "color": {
+                "keys": palette["accent"],
+                "title": palette["accent2"],
+                "output": palette["fg"],
+                "separator": palette["accent2"]
+            }
+        },
+        "modules": [
+            "title",
+            "separator",
+            {"type": "os", "key": "OS", "format": "{name}"},
+            {"type": "host", "key": "Host", "format": "{family}"},
+            {"type": "kernel", "key": "Kernel", "format": "{release}"},
+            {"type": "uptime", "key": "Uptime", "format": "{hours}h {minutes}m"},
+            {"type": "packages", "key": "Packages", "format": "{all}"},
+            {"type": "shell", "key": "Shell", "format": "{pretty-name} {version}"},
+            {"type": "display", "key": "Display", "format": "{width}x{height} @ {refresh-rate}Hz"},
+            {"type": "wm", "key": "WM", "format": "{pretty-name} {version}"},
+            {"type": "terminal", "key": "Terminal", "format": "{pretty-name} {version}"},
+            {"type": "cpu", "key": "CPU", "format": "{name}"},
+            {"type": "gpu", "key": "GPU", "format": "{name}"},
+            {"type": "memory", "key": "Memory", "format": "{used} / {total}"},
+            {"type": "swap", "key": "Swap", "format": "{used} / {total}"},
+            {"type": "disk", "key": "Disk", "folders": "/", "format": "{size-used} / {size-total}"},
+            {"type": "battery", "key": "Battery"},
+            {"type": "localip", "key": "IP", "format": "{ipv4}"},
+            "break",
+            "colors"
+        ]
+    }
+
+    os.makedirs(os.path.dirname(generated), exist_ok=True)
+
+    with open(generated, "w") as f:
+        json.dump(config, f, indent=4)
+
+    print(f"Fastfetch palette updated: {generated}")
+
+
+def update_btop(pal):
+    """Generate a wallpaper-themed btop color scheme."""
+
+    theme_dir = f"{HOME}/.config/btop/themes"
+    output = f"{theme_dir}/wallpalette.theme"
+    os.makedirs(theme_dir, exist_ok=True)
+
+    primary = pal["accent"]
+    secondary = pal["highlight"]
+    fg = pal["fg"]
+    warn = pal["warn"]
+
+    def rgb(color):
+        return tuple(
+            int(color[i:i+2], 16)
+            for i in (1, 3, 5)
+        )
+
+    def mix(first, second, amount):
+        return "#%02x%02x%02x" % tuple(
+            round(a * (1 - amount) + b * amount)
+            for a, b in zip(rgb(first), rgb(second))
+        )
+
+    # Same dark background as SwayNC
+    r, g, b = rgb(primary)
+    h, _, _ = colorsys.rgb_to_hsv(
+        r / 255, g / 255, b / 255
+    )
+
+    bg = hexc(h, 0.65, 0.09)
+
+    primary_dim = mix(bg, primary, 0.45)
+    secondary_dim = mix(bg, secondary, 0.45)
+    text_dim = mix(bg, fg, 0.55)
+    selected_bg = mix(bg, secondary, 0.18)
+    midpoint = mix(primary, secondary, 0.5)
+
+    colors = {
+        # General interface
+        "main_bg": bg,
+        "main_fg": fg,
+        "title": primary,
+        "hi_fg": secondary,
+        "selected_bg": selected_bg,
+        "selected_fg": fg,
+        "inactive_fg": text_dim,
+        "graph_text": fg,
+        "meter_bg": mix(bg, fg, 0.12),
+        "proc_misc": secondary,
+
+        # Box borders
+        "cpu_box": primary,
+        "mem_box": secondary,
+        "net_box": secondary,
+        "proc_box": primary,
+        "div_line": primary_dim,
+
+        # CPU temperature gradient
+        "temp_start": primary,
+        "temp_mid": secondary,
+        "temp_end": warn,
+
+        # CPU and GPU utilization
+        "cpu_start": primary_dim,
+        "cpu_mid": primary,
+        "cpu_end": secondary,
+
+        # Free memory
+        "free_start": secondary_dim,
+        "free_mid": secondary,
+        "free_end": fg,
+
+        # Cached memory
+        "cached_start": primary_dim,
+        "cached_mid": midpoint,
+        "cached_end": secondary,
+
+        # Available memory
+        "available_start": secondary_dim,
+        "available_mid": secondary,
+        "available_end": primary,
+
+        # Used memory
+        "used_start": primary_dim,
+        "used_mid": primary,
+        "used_end": secondary,
+
+        # Download gradient
+        "download_start": primary_dim,
+        "download_mid": primary,
+        "download_end": secondary,
+
+        # Upload gradient
+        "upload_start": secondary_dim,
+        "upload_mid": secondary,
+        "upload_end": primary,
+
+        # Process utilization gradient
+        "process_start": text_dim,
+        "process_mid": primary,
+        "process_end": secondary,
+    }
+
+    theme = "# Generated automatically by wallpalette\n\n"
+
+    for key, value in colors.items():
+        theme += f'theme[{key}]="{value}"\n'
+
+    old = open(output).read() if os.path.exists(output) else ""
+
+    if old != theme:
+        tmp = output + ".new"
+
+        with open(tmp, "w") as f:
+            f.write(theme)
+
+        os.replace(tmp, output)
+
+        print(f"Btop palette updated: {output}")
+
+
+def update_hypr_overview(palette):
+    """Recolor enabled Overview settings and apply them live."""
+    import re
+    import colorsys
+    import subprocess
+    from pathlib import Path
+
+    lua = Path.home() / ".config/hypr/modules/plugins.lua"
+
+    primary = palette["accent"].lstrip("#")
+    r, g, b = (
+        int(primary[i:i + 2], 16) / 255
+        for i in (0, 2, 4)
+    )
+
+    hue, _, _ = colorsys.rgb_to_hsv(r, g, b)
+    dark = hexc(hue, 0.65, 0.09).lstrip("#")
+
+    settings = {
+        "workspaceActiveBackground": f"rgba({primary}2e)",
+        "workspaceInactiveBackground": f"rgba({dark}d9)",
+        "workspaceActiveBorder": f"rgba({primary}ff)",
+    }
+
+    contents = lua.read_text()
+
+    for key, value in settings.items():
+        # Match only active (uncommented) Lua assignments.
+        pattern = rf'(?m)^(\s*{re.escape(key)}\s*=\s*)["\'][^"\']*["\']'
+
+        contents, count = re.subn(
+            pattern,
+            lambda m: m.group(1) + f'"{value}"',
+            contents
+        )
+
+        if count:
+            subprocess.run(
+                ["hyprctl", "keyword", f"plugin:overview:{key}", value],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False
+            )
+
+    lua.write_text(contents)
+    print("Overview colors updated.")
+
+
+def update_swaync(pal):
+    """Generate wallpaper-themed SwayNC CSS from the original stylesheet."""
+    import re
+
+    swaync_dir = f"{HOME}/.config/swaync"
+    template = f"{swaync_dir}/style.css.tmpl"
+    output = f"{swaync_dir}/style.css"
+
+    if not os.path.isfile(template):
+        print("wallpalette: SwayNC template not found", file=sys.stderr)
+        return
+
+    def rgb(hex_color):
+        return tuple(
+            int(hex_color[i:i + 2], 16)
+            for i in (1, 3, 5)
+        )
+
+    def rgba_color(hex_color, alpha):
+        r, g, b = rgb(hex_color)
+        return f"rgba({r}, {g}, {b}, {alpha})"
+
+    # Use a very dark shade of the wallpaper's dominant hue
+    r, g, b = rgb(pal["accent"])
+    h, _, _ = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+    background = hexc(h, 0.65, 0.09)
+
+    css = open(template).read()
+
+    replacements = {
+        # Existing cyan accents
+        r"rgba\(\s*0,\s*210,\s*255,\s*([\d.]+)\s*\)":
+            lambda m: rgba_color(pal["accent"], m.group(1)),
+
+        r"#00d2ff\b":
+            lambda m: pal["accent"],
+
+        # Existing magenta/red warning and danger colors
+        r"rgba\(\s*255,\s*45,\s*85,\s*([\d.]+)\s*\)":
+            lambda m: rgba_color(pal["warn"], m.group(1)),
+
+        r"#ff2d55\b":
+            lambda m: pal["warn"],
+
+        # Dark notification/control-center backgrounds
+        r"rgba\(\s*5,\s*3,\s*20,\s*([\d.]+)\s*\)":
+            lambda m: rgba_color(background, m.group(1)),
+    }
+
+    for pattern, replacement in replacements.items():
+        css = re.sub(
+            pattern,
+            replacement,
+            css,
+            flags=re.IGNORECASE
+        )
+
+    # Replace neutral whites with a wallpaper-tinted foreground,
+    # while retaining their original transparency.
+    css = re.sub(
+        r"rgba\(\s*255,\s*255,\s*255,\s*([\d.]+)\s*\)",
+        lambda m: rgba_color(pal["fg"], m.group(1)),
+        css
+    )
+
+    # Keep the MPRIS title bright and readable
+    css = re.sub(
+        r"#ffffff\b",
+        pal["fg"],
+        css,
+        flags=re.IGNORECASE
+    )
+    
+    # Dual-hue gradients: same colors as Hyprland borders
+    primary = pal["accent"]
+    secondary = pal["highlight"]
+
+    def translucent(hex_color, opacity):
+        r, g, b = (
+            int(hex_color[i:i+2], 16)
+            for i in (1, 3, 5)
+        )
+        return f"rgba({r}, {g}, {b}, {opacity})"
+
+    gradient_css = f"""
+/* === WALLPALETTE DUAL-HUE THEME === */
+
+/* Main notification center */
+.control-center {{
+    border-left: px solid {primary};
+    border-top: px solid {primary};
+    border-right: px solid {primary};
+    border-bottom: px solid {primary};
+
+    background-image: linear-gradient(
+        135deg,
+        {translucent(primary, 0.025)},
+        {translucent(secondary, 0.075)}
+    );
+}}
+
+/* Notification cards */
+.notification {{
+    border-top: 1px solid {translucent(primary, 0.50)};
+    border-left: 1px solid {translucent(primary, 0.50)};
+    border-bottom: 1px solid {translucent(secondary, 0.50)};
+    border-right: 1px solid {translucent(secondary, 0.50)};
+}}
+
+/* Media player */
+.widget-mpris {{
+    border-top: 1px solid {primary};
+    border-left: 1px solid {primary};
+    border-bottom: 1px solid {secondary};
+    border-right: 1px solid {secondary};
+}}
+
+/* Music metadata */
+.widget-mpris-subtitle {{
+    color: {secondary};
+}}
+
+/* Interactive buttons */
+.widget-buttons-grid > flowbox > flowboxchild > button.active {{
+    background-image: linear-gradient(
+        to right,
+        {translucent(primary, 0.25)},
+        {translucent(secondary, 0.25)}
+    );
+    color: {primary};
+}}
+
+/* Do Not Disturb switch */
+.widget-dnd > switch:checked {{
+    background-image: linear-gradient(
+        to right,
+        {primary},
+        {secondary}
+    );
+}}
+
+/* Volume / brightness sliders */
+scale highlight {{
+    background-image: linear-gradient(
+        to right,
+        {primary},
+        {secondary}
+    );
+}}
+
+/* Popup notifications */
+.notification-popup {{
+    border-top: 1px solid {primary};
+    border-left: 1px solid {primary};
+    border-bottom: 1px solid {secondary};
+    border-right: 1px solid {secondary};
+}}
+"""
+
+    css += "\n" + gradient_css
+
+
+    # Only rewrite when the CSS actually changes
+    old = open(output).read() if os.path.exists(output) else ""
+
+    if css != old:
+        tmp = output + ".new"
+        with open(tmp, "w") as f:
+            f.write(css)
+
+        os.replace(tmp, output)
+
+        # Ask SwayNC to reload its stylesheet
+        subprocess.run(
+            ["swaync-client", "--reload-css"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False
+        )
+
+        print("SwayNC colors updated")
+
+def update_rofi(pal):
+    """Render both Rofi themes using the existing wallpaper palette."""
+    from pathlib import Path
+
+    rofi_dir = Path(HOME) / '.config' / 'rofi'
+
+    def rgb(color):
+        return tuple(int(color[i:i + 2], 16) for i in (1, 3, 5))
+
+    def blend(a, b, amount):
+        aa, bb = rgb(a), rgb(b)
+        return '#%02x%02x%02x' % tuple(
+            round(x * (1 - amount) + y * amount) for x, y in zip(aa, bb)
+        )
+
+    def alpha(color, value):
+        return color + f'{round(value * 255):02x}'
+
+    primary = pal['accent']
+    secondary = pal['highlight']
+    warn = pal['warn']
+    fg = pal['fg']
+    h, _, _ = colorsys.rgb_to_hsv(*(x / 255 for x in rgb(primary)))
+    base = hexc(h, 0.30, 0.035)
+    panel = blend(base, secondary, 0.045)
+
+    colors = {
+        'WP_BG_DEEP': alpha(base, 0.80),
+        'WP_BG_PANEL': alpha(panel, 0.77),
+        'WP_BG_INPUT': alpha(base, 0.72),
+        'WP_BG_HOVER': alpha(blend(base, primary, 0.16), 0.85),
+        'WP_BG_SELECTED': alpha(blend(base, secondary, 0.18), 0.92),
+        'WP_BG_URGENT': alpha(blend(base, warn, 0.15), 0.90),
+        'WP_PRIMARY': primary,
+        'WP_PRIMARY_DIM': alpha(primary, 0.48),
+        'WP_SECONDARY': secondary,
+        'WP_SECONDARY_DIM': alpha(secondary, 0.48),
+        'WP_WARN': warn,
+        'WP_FG': fg,
+        'WP_TEXT_MID': blend(fg, base, 0.25),
+        'WP_TEXT_DIM': blend(fg, base, 0.52),
+        'WP_BORDER_NORMAL': alpha(blend(primary, secondary, 0.5), 0.25),
+    }
+
+    for name in ('application-manager', 'rofi-emoji'):
+        template = rofi_dir / f'{name}.rasi.tmpl'
+        output = rofi_dir / f'{name}.rasi'
+        if not template.is_file():
+            print(f'wallpalette: missing Rofi template: {template}', file=sys.stderr)
+            continue
+        css = template.read_text()
+        for key, value in colors.items():
+            css = css.replace('@' + key + '@', value)
+        if output.is_file() and output.read_text() == css:
+            continue
+        tmp = output.with_suffix('.rasi.new')
+        tmp.write_text(css)
+        os.replace(tmp, output)
+        print(f'Rofi theme updated: {output}')
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit("usage: wallpalette <image>")
+    try:
+        pal = build(dominant_hues(sys.argv[1]))
+    except Exception as e:
+        print("wallpalette: falling back to default palette:", e, file=sys.stderr)
+        pal = dict(DEFAULT)
+
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    with open(OUT, "w") as f:                              # in place, so file watchers see it
+        json.dump(pal, f)
+
+    if os.path.exists(TMPL):
+        s = open(TMPL).read()
+        for key, ph in (("fg", "@FG@"), ("accent", "@ACCENT@"), ("accent2", "@ACCENT2@"),
+                        ("warn", "@WARN@"), ("highlight", "@HIGHLIGHT@")):
+            s = s.replace(ph, pal[key].upper())
+        tmp = CONKY + ".new"
+        open(tmp, "w").write(s)
+        os.replace(tmp, CONKY)                             # conky reloads on change
+
+    if os.path.isdir(WAYBAR_DIR):                          # waybar: @define-color file + style reload
+        css = "".join(f"@define-color wp_{k} {v};\n" for k, v in pal.items())
+        path = WAYBAR_DIR + "/colors.css"
+        old = open(path).read() if os.path.exists(path) else ""
+        if css != old:
+            tmp = path + ".new"
+            open(tmp, "w").write(css)
+            os.replace(tmp, path)
+            try:
+                subprocess.run(["pkill", "-SIGUSR2", "-x", "waybar"], check=False)
+            except Exception:
+                pass
+    apply_borders(pal)
+    update_fastfetch(pal)
+    subprocess.run(["hyprctl", "reload"], capture_output=False, text=False,check=False)
+    update_swaync(pal)
+    update_rofi(pal)
+    update_hypr_overview(pal)
+    update_btop(pal)
+    print(json.dumps(pal))
+
+main()

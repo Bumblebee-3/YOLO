@@ -1,0 +1,60 @@
+#!/bin/bash
+# Fixed sysfs writer for this Zenbook's existing four Waybar modes.
+set -euo pipefail
+export PATH=/usr/bin:/bin LC_ALL=C
+die() { printf 'zenbook-power-write: %s\n' "$*" >&2; exit 1; }
+[[ $EUID == 0 ]] || die 'administrator access required'
+[[ $# == 2 ]] || die 'expected VALUE PATH'
+value=$1
+path=$2
+case "$path" in
+    /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw|/sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw)
+        [[ $value == 15000000 || $value == 115000000 ]] || die 'unsupported long-term limit' ;;
+    /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw|/sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw)
+        [[ $value == 20000000 || $value == 115000000 ]] || die 'unsupported short-term limit' ;;
+    /sys/module/pcie_aspm/parameters/policy)
+        [[ $value == default || $value == powersupersave ]] || die 'unsupported ASPM policy' ;;
+    *)
+        if [[ $path =~ ^/sys/devices/system/cpu/cpu([0-9]+)/online$ ]]; then
+            cpu=${BASH_REMATCH[1]}
+            [[ $cpu =~ ^([1-9]|1[0-3])$ ]] || die 'unsupported CPU hotplug target'
+            [[ $value == 0 || $value == 1 ]] || die 'invalid online value'
+        elif [[ $path =~ ^/sys/devices/system/cpu/(cpufreq/policy|cpu)([0-9]+)(/cpufreq)?/scaling_max_freq$ ]]; then
+            prefix=${BASH_REMATCH[1]}
+            cpu=${BASH_REMATCH[2]}
+            suffix=${BASH_REMATCH[3]}
+            [[ $cpu =~ ^([0-9]|1[0-5])$ ]] || die 'unsupported CPU policy'
+            [[ ( $prefix == cpufreq/policy && -z $suffix ) || ( $prefix == cpu && $suffix == /cpufreq ) ]] || die 'invalid CPU path'
+            [[ $value =~ ^[1-9][0-9]{5,7}$ ]] || die 'invalid frequency'
+            parent=${path%/*}
+            minimum=$(<"$parent/cpuinfo_min_freq")
+            maximum=$(<"$parent/cpuinfo_max_freq")
+            (( value >= minimum && value <= maximum )) || die 'frequency outside hardware range'
+        elif [[ $path =~ ^/sys/devices/system/cpu/cpu([0-9]+)/power/energy_perf_bias$ ]]; then
+            [[ ${BASH_REMATCH[1]} =~ ^([0-9]|1[0-5])$ ]] || die 'unsupported CPU'
+            [[ $value =~ ^([0-9]|1[0-5])$ ]] || die 'invalid energy bias'
+        else
+            die 'path is not permitted'
+        fi ;;
+esac
+[[ -f $path ]] || die "missing hardware setting: $path"
+printf '%s\n' "$value" > "$path"
+# CPUFreq applies policy-limit changes through deferred kernel work. A
+# successful write may briefly read back the previous limit. Poll the result;
+# do not repeat the write or mistake the transient old value for failure.
+attempts=1
+[[ $path != */scaling_max_freq ]] || attempts=101
+for ((attempt=1; attempt<=attempts; attempt++)); do
+    actual=$(cat -- "$path")
+    if [[ $path == /sys/module/pcie_aspm/parameters/policy ]]; then
+        [[ $actual != *"[$value]"* ]] || exit 0
+    else
+        [[ $actual != "$value" ]] || exit 0
+    fi
+    if (( attempt < attempts )); then sleep 0.02; fi
+done
+if [[ $path == /sys/module/pcie_aspm/parameters/policy ]]; then
+    die 'ASPM policy was not applied'
+else
+    die "setting was not applied: $path (requested $value, read back $actual after verification)"
+fi

@@ -1,0 +1,4 @@
+# Optional tools for maintaining the desktop configuration
+git
+shellcheck
+stylua

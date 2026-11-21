@@ -1,0 +1,14 @@
+#!/bin/bash
+# wait for Hyprland to report the display, then give plugins/waybar a moment to settle
+for i in $(seq 1 200); do
+    hyprctl -j monitors 2>/dev/null | jq -e "length > 0" >/dev/null && break
+    sleep 0.1
+done
+
+for w in clock systemcore nowplaying visualizer osk; do
+    ( while true; do
+          quickshell -p "$HOME/.config/quickshell/$w.qml"
+          sleep 2
+      done ) &
+done
+wait

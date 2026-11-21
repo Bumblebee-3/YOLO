@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+"""dynsky-build <animated.gif> [--out DIR] [--lat 12.97 --lon 77.59] [--jobs N] [--only NAME]
+
+Renders the wallpaper at 16 times of day (relative to sunrise / sunset) into DIR
+(default: <gif without extension>.dynsky/) and writes schedule.json for dynsky-run."""
+import os, sys, json, argparse, datetime, subprocess, tempfile, shutil, time
+import numpy as np, cv2
+from multiprocessing import Pool
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+import dynsky
+from dynsky import H, W
+
+KEYFRAMES = [   # name, anchor, minutes offset from the anchor
+    ("night-a",  "MID",     0), ("night-b",  "SR", -170), ("predawn",  "SR",  -75),
+    ("blue-am",  "SR",    -35), ("pre-rise", "SR",   -8), ("sunrise",  "SR",   12),
+    ("morning",  "SR",     60), ("forenoon", "SR",  170), ("noon",     "NOON",  0),
+    ("afternoon","SS",   -170), ("late-pm",  "SS",  -75), ("golden",   "SS",  -35),
+    ("sunset",   "SS",     -8), ("dusk-a",   "SS",   12), ("dusk-b",   "SS",   45),
+    ("night-c",  "SS",    110),
+]
+
+def load_frames(gif, raw_path):
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", gif, "-vf", f"scale={W}:{H}:flags=lanczos",
+           "-f", "rawvideo", "-pix_fmt", "bgr24", raw_path]
+    subprocess.run(cmd, check=True)
+    n = os.path.getsize(raw_path) // (W * H * 3)
+    return n
+
+def render_keyframe(args):
+    (idx, name, anchor, off, raw_path, nframes, ev, lat, lon, tz, date, outdir, fps, tmp, screen, limit) = args
+    frames = np.memmap(raw_path, dtype=np.uint8, mode="r", shape=(nframes, H, W, 3))
+    mean = frames[::max(1, nframes // 12)].astype(np.float32).mean(axis=0).astype(np.uint8)
+    mask, strip = dynsky.make_mask(mean), dynsky.make_strip(mean)
+    stars = dynsky.make_stars()
+    grain = np.random.default_rng(3).normal(0, 0.012, (H, W, 3)).astype(np.float32)
+    mins = (ev[anchor] + off) % 1440
+    dt = datetime.datetime(date.year, date.month, date.day, mins // 60, mins % 60)
+    e, ha = dynsky.sun_state(dt, lat, lon, tz)
+    mph = dynsky.moon_phase(dt)
+    sw, sh = screen
+    scale = max(sw / W, sh / H)
+    nw, nh = round(W * scale), round(H * scale)
+    x0, y0 = (nw - sw) // 2, (nh - sh) // 2
+    out_raw = os.path.join(tmp, f"{idx:02d}.raw")
+    with open(out_raw, "wb") as f:
+        for i in range(min(nframes, limit) if limit else nframes):
+            fr = dynsky.render_frame(np.asarray(frames[i]), mask, strip, e, ha, mph, stars, i / nframes, grain)
+            if (nw, nh) != (W, H):
+                fr = cv2.resize(fr, (nw, nh), interpolation=cv2.INTER_LANCZOS4)
+            f.write(np.ascontiguousarray(fr[y0:y0 + sh, x0:x0 + sw]).tobytes())
+    gif = os.path.join(outdir, f"{idx:02d}-{name}.gif")
+    pal = os.path.join(tmp, f"{idx:02d}.png")
+    src = ["-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{sw}x{sh}", "-r", str(fps), "-i", out_raw]
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *src, "-vf", "palettegen=stats_mode=full", pal], check=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *src, "-i", pal, "-lavfi",
+                    "paletteuse=dither=sierra2_4a:diff_mode=rectangle", "-loop", "0", gif], check=True)
+    os.remove(out_raw)
+    return idx, name, os.path.basename(gif), mins, round(e, 1)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("gif"); ap.add_argument("--out")
+    ap.add_argument("--lat", type=float, default=12.97); ap.add_argument("--lon", type=float, default=77.59)
+    ap.add_argument("--tz", type=float, default=None, help="UTC offset in hours (default: system)")
+    ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) // 2))
+    ap.add_argument("--only", help="render just this keyframe name (for testing)")
+    ap.add_argument("--screen", default="1920x1200", help="output size = your monitor's pixels, so awww never rescales (default 1920x1200)")
+    ap.add_argument("--frames", type=int, default=0, help="render only the first N frames (quick tests)")
+    a = ap.parse_args()
+
+    gif = os.path.abspath(a.gif)
+    outdir = a.out or os.path.splitext(gif)[0] + ".dynsky"
+    os.makedirs(outdir, exist_ok=True)
+    tz = a.tz if a.tz is not None else datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600
+    date = datetime.date.today()
+    ev = dynsky.sun_events(date, a.lat, a.lon, tz)
+    fps = 20
+    screen = tuple(int(v) for v in a.screen.lower().split("x"))
+    tmp = tempfile.mkdtemp(prefix=".work-", dir=outdir)   # on disk, not /tmp (tmpfs is RAM)
+    try:
+        raw = os.path.join(tmp, "src.raw")
+        print("decoding source...", flush=True)
+        n = load_frames(gif, raw)
+        todo = [(i, *k) for i, k in enumerate(KEYFRAMES) if not a.only or k[0] == a.only]
+        jobs = [(i, nm, an, off, raw, n, ev, a.lat, a.lon, tz, date, outdir, fps, tmp, screen, a.frames) for i, nm, an, off in todo]
+        print(f"rendering {len(jobs)} keyframes x {n} frames with {a.jobs} workers "
+              f"(sunrise {ev['SR']//60:02d}:{ev['SR']%60:02d}, sunset {ev['SS']//60:02d}:{ev['SS']%60:02d})", flush=True)
+        t0 = time.time()
+        with Pool(a.jobs) as pool:
+            for idx, name, fn, mins, e in pool.imap_unordered(render_keyframe, jobs):
+                print(f"  [{idx+1:2d}/{len(KEYFRAMES)}] {fn}  ({mins//60:02d}:{mins%60:02d}, sun {e:+.0f} deg)  {time.time()-t0:.0f}s", flush=True)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    sched = {"lat": a.lat, "lon": a.lon,
+             "keyframes": [{"file": f"{i:02d}-{nm}.gif", "anchor": an, "offset": off} for i, (nm, an, off) in enumerate(KEYFRAMES)]}
+    with open(os.path.join(outdir, "schedule.json"), "w") as f:
+        json.dump(sched, f, indent=1)
+    print("done ->", outdir)
+
+if __name__ == "__main__":
+    main()

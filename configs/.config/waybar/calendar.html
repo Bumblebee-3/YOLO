@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #050508;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,45,85,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .calendar {
+    background: rgba(10, 10, 15, 0.95);
+    border: 1px solid rgba(255, 45, 85, 0.3);
+    border-radius: 4px;
+    padding: 28px;
+    width: 340px;
+    box-shadow: 0 0 40px rgba(255, 45, 85, 0.15), inset 0 0 40px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .calendar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ff2d55, transparent);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .month-year {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ff2d55;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid rgba(255, 45, 85, 0.3);
+    color: #ff2d55;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    background: rgba(255, 45, 85, 0.2);
+    border-color: #ff2d55;
+  }
+
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+  }
+
+  .weekday {
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    padding: 4px 0;
+  }
+
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .day {
+    text-align: center;
+    padding: 7px 4px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .day:hover {
+    color: #fff;
+    background: rgba(255, 45, 85, 0.15);
+    border-color: rgba(255, 45, 85, 0.3);
+  }
+
+  .day.today {
+    color: #ff2d55;
+    border-color: #ff2d55;
+    background: rgba(255, 45, 85, 0.1);
+    font-weight: bold;
+  }
+
+  .day.other-month {
+    color: rgba(255,255,255,0.15);
+  }
+
+  .day.selected {
+    background: #ff2d55;
+    color: #fff;
+    border-color: #ff2d55;
+  }
+
+  .time-display {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,45,85,0.2);
+    text-align: center;
+  }
+
+  .time {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    color: #ff2d55;
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(255,45,85,0.5);
+  }
+
+  .date-full {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="calendar">
+  <div class="header">
+    <button class="nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+    <div class="month-year" id="monthYear"></div>
+    <button class="nav-btn" onclick="changeMonth(1)">&#8594;</button>
+  </div>
+  <div class="weekdays">
+    <div class="weekday">SUN</div>
+    <div class="weekday">MON</div>
+    <div class="weekday">TUE</div>
+    <div class="weekday">WED</div>
+    <div class="weekday">THU</div>
+    <div class="weekday">FRI</div>
+    <div class="weekday">SAT</div>
+  </div>
+  <div class="days" id="days"></div>
+  <div class="time-display">
+    <div class="time" id="time"></div>
+    <div class="date-full" id="dateFull"></div>
+  </div>
+</div>
+
+<script>
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days_names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  let current = new Date();
+  let viewing = new Date(current.getFullYear(), current.getMonth(), 1);
+  let selected = null;
+
+  function render() {
+    const year = viewing.getFullYear();
+    const month = viewing.getMonth();
+    document.getElementById('monthYear').textContent = `${months[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrev = new Date(year, month, 0).getDate();
+
+    const container = document.getElementById('days');
+    container.innerHTML = '';
+
+    // Prev month days
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = daysInPrev - i;
+      container.appendChild(d);
+    }
+
+    // Current month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = document.createElement('div');
+      d.className = 'day';
+      d.textContent = i;
+      const isToday = i === current.getDate() && month === current.getMonth() && year === current.getFullYear();
+      if (isToday) d.classList.add('today');
+      if (selected && selected.getDate() === i && selected.getMonth() === month && selected.getFullYear() === year)
+        d.classList.add('selected');
+      d.onclick = () => {
+        selected = new Date(year, month, i);
+        render();
+      };
+      container.appendChild(d);
+    }
+
+    // Next month
+    const total = container.children.length;
+    const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 1; i <= remaining; i++) {
+      const d = document.createElement('div');
+      d.className = 'day other-month';
+      d.textContent = i;
+      container.appendChild(d);
+    }
+  }
+
+  function changeMonth(dir) {
+    viewing.setMonth(viewing.getMonth() + dir);
+    render();
+  }
+
+  function updateTime() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = String(h % 12 || 12).padStart(2, '0');
+    document.getElementById('time').textContent = `${h12}:${m} ${ampm}`;
+    document.getElementById('dateFull').textContent = `${days_names[now.getDay()]} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  }
+
+  render();
+  updateTime();
+  setInterval(updateTime, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+#!/usr/bin/python -I
+import json
+import os
+import re
+import fcntl
+import sys
+import tempfile
+from pathlib import Path
+
+THEME = Path("/usr/share/sddm/themes/yolo")
+CONF = THEME / "Themes/astronaut.conf"
+BG_DIR = THEME / "Backgrounds"
+
+def fail(message):
+    sys.exit(f"theme-sddm: {message}")
+
+def dark_color(hex_color):
+    import colorsys
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i+2], 16) / 255 for i in (0, 2, 4))
+    hue, _, _ = colorsys.rgb_to_hsv(r, g, b)
+    r, g, b = colorsys.hsv_to_rgb(hue, 0.65, 0.09)
+    return "#{:02x}{:02x}{:02x}".format(
+        round(r * 255), round(g * 255), round(b * 255)
+    )
+
+def set_key(contents, key, value):
+    line = f'{key}="{value}"'
+    pattern = rf'(?m)^{re.escape(key)}\s*=.*$'
+    if re.search(pattern, contents):
+        return re.sub(pattern, lambda _: line, contents)
+    return contents.rstrip() + "\n" + line + "\n"
+
+def main():
+    if os.geteuid() != 0:
+        fail("must run as root")
+
+    if len(sys.argv) != 1:
+        fail("unexpected arguments")
+
+    # The unprivileged sender opens both files. Root accepts a bounded stream
+    # and writes only fixed filenames inside the administrator-owned theme.
+    lock = (THEME / ".publish.lock").open("a")
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    stream = sys.stdin.buffer
+    line = stream.readline(16385)
+    if len(line) > 16384 or not line.endswith(b"\n"):
+        fail("invalid palette header")
+    palette = json.loads(line)
+
+    for key in ("fg", "accent", "highlight"):
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", palette[key]):
+            fail(f"invalid palette color: {key}")
+
+    accent = palette["accent"]
+    highlight = palette["highlight"]
+    fg = palette["fg"]
+    dark = dark_color(accent)
+
+
+    # Preserve animated GIFs; use PNG for static wallpapers.
+    signature = stream.read(8)
+    if signature.startswith((b"GIF87a", b"GIF89a")):
+        suffix = ".gif"
+    elif signature == b"\x89PNG\r\n\x1a\n":
+        suffix = ".png"
+    else:
+        fail("expected PNG or GIF")
+    bg = BG_DIR / ("wallpalette-current" + suffix)
+    with tempfile.NamedTemporaryFile(dir=BG_DIR, delete=False) as out:
+        tmp = Path(out.name)
+        try:
+            out.write(signature)
+            while chunk := stream.read(1024 * 1024):
+                if out.tell() + len(chunk) > 500 * 1024**2:
+                    fail("wallpaper exceeds 500 MiB")
+                out.write(chunk)
+            out.flush()
+            os.chmod(tmp, 0o644)
+            os.replace(tmp, bg)
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    contents = CONF.read_text()
+
+    settings = {
+        "Background": f"Backgrounds/{bg.name}",
+        "BackgroundPlaceholder": "",
+        "BackgroundColor": dark,
+        "FormBackgroundColor": dark,
+        "DimBackgroundColor": dark,
+        "LoginFieldBackgroundColor": dark,
+        "PasswordFieldBackgroundColor": dark,
+        "LoginButtonBackgroundColor": accent,
+        "DropdownSelectedBackgroundColor": accent,
+        "DropdownBackgroundColor": dark,
+        "HighlightBackgroundColor": highlight,
+        "HighlightTextColor": fg,
+    }
+
+    for key, value in settings.items():
+        contents = set_key(contents, key, value)
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", dir=CONF.parent, delete=False
+    ) as tmp:
+        tmp.write(contents)
+        temp_conf = Path(tmp.name)
+
+    try:
+        os.chmod(temp_conf, 0o644)
+        os.replace(temp_conf, CONF)
+    finally:
+        temp_conf.unlink(missing_ok=True)
+
+    print("SDDM Astronaut wallpaper and colors updated.")
+
+if __name__ == "__main__":
+    main()

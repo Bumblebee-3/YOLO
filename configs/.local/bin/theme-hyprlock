@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+import json
+import os
+import re
+import colorsys
+from pathlib import Path
+
+home = Path.home()
+palette_path = home / ".cache/wallpalette/colors.json"
+template_path = home / ".config/hypr/hyprlock.conf.tmpl"
+output_path = home / ".config/hypr/hyprlock.conf"
+
+pal = json.loads(palette_path.read_text())
+
+def rgba(color, alpha=1.0):
+    color = color.lstrip("#")
+    return f"rgba({color}{round(alpha * 255):02x})"
+
+def dark_color(color):
+    color = color.lstrip("#")
+    r, g, b = (int(color[i:i+2], 16) / 255 for i in (0, 2, 4))
+    h, _, _ = colorsys.rgb_to_hsv(r, g, b)
+    r, g, b = colorsys.hsv_to_rgb(h, 0.65, 0.09)
+    return "#{:02x}{:02x}{:02x}".format(
+        round(r * 255), round(g * 255), round(b * 255)
+    )
+
+wallpaper = os.environ.get("WALLPAPER", "")
+
+# Prefer an explicitly supplied wallpaper; otherwise read a cached path.
+if not wallpaper:
+    for candidate in [
+        home / ".cache/wallpalette/current_wallpaper",
+        home / ".cache/current_wallpaper",
+    ]:
+        if candidate.exists():
+            wallpaper = candidate.read_text().strip()
+            break
+
+if not wallpaper:
+    print("No wallpaper path found. Pass WALLPAPER=/absolute/path/to/image")
+    raise SystemExit(1)
+
+wallpaper = str(Path(wallpaper).expanduser().resolve())
+
+if not Path(wallpaper).is_file():
+    raise SystemExit(f"Wallpaper not found: {wallpaper}")
+
+accent = pal["accent"]
+highlight = pal["highlight"]
+fg = pal["fg"]
+warn = pal["warn"]
+bg = dark_color(accent)
+
+values = {
+    "@WALLPAPER@": wallpaper,
+    "@ACCENT@": rgba(accent),
+    "@ACCENT_SOFT@": rgba(accent, 0.40),
+    "@ACCENT_SHADOW@": rgba(accent, 0.15),
+    "@HIGHLIGHT@": rgba(highlight, 0.85),
+    "@HIGHLIGHT_SOFT@": rgba(highlight, 0.25),
+    "@FG@": rgba(fg, 0.92),
+    "@FG_MUTED@": rgba(fg, 0.55),
+    "@FG_FAINT@": rgba(fg, 0.20),
+    "@BG@": rgba(bg, 0.75),
+    "@SUCCESS@": rgba(pal["warn"], 0.85),
+"@WARN@": rgba("#ff455e", 0.85),
+"@PLACEHOLDER@": f"#{pal['fg'].lstrip('#')}55",
+"@FAIL_TEXT@": "#ff455ecc",
+}
+
+config = template_path.read_text()
+for key, value in values.items():
+    config = config.replace(key, value)
+
+unresolved = re.findall(r"@[A-Z_]+@", config)
+if unresolved:
+    raise SystemExit(f"Unresolved placeholders: {unresolved}")
+
+output_path.write_text(config)
+print(f"Hyprlock themed: {wallpaper}")

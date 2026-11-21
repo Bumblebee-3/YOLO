@@ -1,0 +1,15 @@
+# tier|scope|repository path|destination relative to scope
+core|home|configs/.config|.config
+core|home|configs/.local|.local
+core|home|themes/oledwall|oledwall
+core|home|themes/animwall|animwall
+core|system|system/etc/sddm.conf.d|etc/sddm.conf.d
+core|system|system/etc/sudoers.d|etc/sudoers.d
+core|system|system/usr|usr
+hw-zenbook|home|profiles/hw-zenbook/hypr/zenbook.lua|.config/hypr/zenbook.lua
+hw-zenbook|home|profiles/hw-zenbook/hypr/powermode.sh|.config/hypr/scripts/powermode.sh
+hw-zenbook|system|profiles/hw-zenbook/zenbook-power-write|usr/local/libexec/zenbook-power-write
+hw-zenbook|system|profiles/hw-zenbook/yolo-zenbook|etc/sudoers.d/yolo-zenbook
+touch|home|profiles/touch/setup-gestures|.local/bin/yolo-setup-gestures
+extra|home|profiles/extra/memoria.toml|.config/memoria/config.toml
+core|system|configs/.local/share/fonts/SF-Pro-Display/SFPRODISPLAYMEDIUM.OTF|usr/local/share/fonts/yolo/SFPRODISPLAYMEDIUM.OTF

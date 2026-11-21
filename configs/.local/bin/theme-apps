@@ -1,0 +1,272 @@
+#!/usr/bin/env python3
+import json
+import colorsys
+import re
+import shutil
+from pathlib import Path
+
+HOME = Path.home()
+CONFIG = HOME / ".config"
+PALETTE = HOME / ".cache/wallpalette/colors.json"
+pal = json.loads(PALETTE.read_text())
+
+def rgb(c):
+    c = c.lstrip("#")
+    return tuple(int(c[i:i+2], 16) / 255 for i in (0, 2, 4))
+
+def hexc(values):
+    return "#" + "".join(
+        f"{round(max(0, min(1, x))*255):02x}"
+        for x in values
+    )
+
+def mix(a, b, amount):
+    x, y = rgb(a), rgb(b)
+    return hexc(tuple(
+        x[i]*(1-amount) + y[i]*amount
+        for i in range(3)
+    ))
+
+def dark(c, saturation, value):
+    h, _, _ = colorsys.rgb_to_hsv(*rgb(c))
+    return hexc(colorsys.hsv_to_rgb(
+        h, saturation, value
+    ))
+
+def argb(c, alpha=255):
+    return f"#{alpha:02x}{c.lstrip('#')}"
+
+fg = pal["fg"]
+accent = pal["accent"]
+accent2 = pal["accent2"]
+highlight = pal["highlight"]
+success = pal["warn"]
+
+bg = dark(accent, 0.65, 0.09)
+surface = mix(bg, fg, 0.065)
+raised = mix(bg, fg, 0.12)
+input_bg = mix(bg, "#000000", 0.24)
+hover = mix(surface, accent, 0.20)
+border = mix(surface, accent2, 0.35)
+muted = mix(fg, bg, 0.43)
+disabled = mix(fg, bg, 0.62)
+
+# Dark text for bright selected backgrounds
+selection_text = bg
+
+# Qt QPalette roles in qt6ct's 21-color order:
+# WindowText, Button, Light, Midlight, Dark, Mid,
+# Text, BrightText, ButtonText, Base, Window,
+# Shadow, Highlight, HighlightedText, Link,
+# LinkVisited, AlternateBase, NoRole, ToolTipBase,
+# ToolTipText, PlaceholderText
+
+def qt_roles(is_disabled=False):
+    text = disabled if is_disabled else fg
+    selection = raised if is_disabled else accent
+
+    return [
+        text,          # WindowText
+        surface,       # Button
+        raised,        # Light
+        raised,        # Midlight
+        bg,            # Dark
+        border,        # Mid
+        text,          # Text
+        fg,            # BrightText
+        text,          # ButtonText
+        input_bg,      # Base
+        bg,            # Window
+        "#000000",     # Shadow
+        selection,     # Highlight
+        disabled if is_disabled else selection_text,
+        highlight,     # Link
+        accent2,       # LinkVisited
+        surface,       # AlternateBase
+        fg,            # NoRole
+        raised,        # ToolTipBase
+        fg,            # ToolTipText
+        muted,         # PlaceholderText
+    ]
+
+def qt_line(roles):
+    return ", ".join(
+        argb(c, 128 if i == 20 else 255)
+        for i, c in enumerate(roles)
+    )
+
+qt_scheme = (
+    "[ColorScheme]\n"
+    f"active_colors={qt_line(qt_roles())}\n"
+    f"disabled_colors={qt_line(qt_roles(True))}\n"
+    f"inactive_colors={qt_line(qt_roles())}\n"
+)
+
+def update_qt(version):
+    directory = CONFIG / version
+    directory.mkdir(parents=True, exist_ok=True)
+
+    colors_dir = directory / "colors"
+    colors_dir.mkdir(exist_ok=True)
+
+    scheme = colors_dir / "wallpalette.conf"
+    scheme.write_text(qt_scheme)
+
+    config = directory / f"{version}.conf"
+
+    if config.exists():
+        content = config.read_text()
+        if not (config.with_suffix(".conf.bak")).exists():
+            shutil.copy2(
+                config,
+                config.with_suffix(".conf.bak")
+            )
+    else:
+        content = "[Appearance]\n"
+
+    if "[Appearance]" not in content:
+        content = "[Appearance]\n" + content
+
+    section_match = re.search(
+        r"(?ms)^\[Appearance\]\s*\n(.*?)(?=^\[|\Z)",
+        content
+    )
+
+    section = section_match.group(1)
+
+    updates = {
+        "color_scheme_path": str(scheme),
+        "custom_palette": "true",
+        "style": "Fusion",
+    }
+
+    for key, value in updates.items():
+        pattern = rf"(?m)^{re.escape(key)}=.*$"
+        if re.search(pattern, section):
+            section = re.sub(
+                pattern,
+                lambda m, k=key, v=value: f"{k}={v}",
+                section
+            )
+        else:
+            section += f"{key}={value}\n"
+
+    content = (
+        content[:section_match.start(1)]
+        + section
+        + content[section_match.end(1):]
+    )
+
+    config.write_text(content)
+    print(f"{version}: {scheme}")
+
+update_qt("qt6ct")
+update_qt("qt5ct")
+
+# GTK named colors used by many traditional GTK themes.
+gtk_colors = {
+    "theme_bg_color": bg,
+    "theme_fg_color": fg,
+    "theme_base_color": input_bg,
+    "theme_text_color": fg,
+    "theme_selected_bg_color": accent,
+    "theme_selected_fg_color": selection_text,
+    "theme_unfocused_bg_color": bg,
+    "theme_unfocused_fg_color": muted,
+    "theme_unfocused_selected_bg_color": accent2,
+    "theme_unfocused_selected_fg_color": fg,
+    "borders": border,
+    "unfocused_borders": surface,
+    "warning_color": highlight,
+    "success_color": success,
+    "error_color": "#ff455e",
+    "accent_color": accent,
+    "accent_bg_color": accent,
+    "accent_fg_color": selection_text,
+    "window_bg_color": bg,
+    "window_fg_color": fg,
+    "view_bg_color": input_bg,
+    "view_fg_color": fg,
+    "headerbar_bg_color": surface,
+    "headerbar_fg_color": fg,
+    "headerbar_border_color": border,
+    "card_bg_color": raised,
+    "card_fg_color": fg,
+    "popover_bg_color": surface,
+    "popover_fg_color": fg,
+}
+
+gtk_css = (
+    "/* BEGIN WALLPALETTE GENERATED */\n"
+    + "\n".join(
+        f"@define-color {key} {value};"
+        for key, value in gtk_colors.items()
+    )
+    + f"""
+
+/* Traditional GTK widgets */
+window {{
+    background-color: {bg};
+    color: {fg};
+}}
+
+headerbar, .titlebar {{
+    background-color: {surface};
+    color: {fg};
+}}
+
+entry, textview text, treeview.view {{
+    background-color: {input_bg};
+    color: {fg};
+}}
+
+selection, *:selected {{
+    background-color: {accent};
+    color: {selection_text};
+}}
+
+button:checked, switch:checked,
+check:checked, radio:checked {{
+    background-color: {accent};
+    color: {selection_text};
+}}
+
+*:focus-visible {{
+    outline-color: {accent};
+}}
+
+tooltip, popover {{
+    background-color: {surface};
+    color: {fg};
+}}
+
+/* END WALLPALETTE GENERATED */
+"""
+)
+
+def update_gtk(version):
+    directory = CONFIG / version
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "gtk.css"
+
+    old = path.read_text() if path.exists() else ""
+
+    if old and not path.with_suffix(".css.bak").exists():
+        shutil.copy2(path, path.with_suffix(".css.bak"))
+
+    old = re.sub(
+        r"/\* BEGIN WALLPALETTE GENERATED \*/.*?"
+        r"/\* END WALLPALETTE GENERATED \*/\s*",
+        "",
+        old,
+        flags=re.S
+    )
+
+    # Generated rules are placed last so they take precedence
+    path.write_text(old.rstrip() + "\n\n" + gtk_css)
+    print(f"GTK {version}: {path}")
+
+update_gtk("gtk-3.0")
+update_gtk("gtk-4.0")
+
+print("Wallpaper-driven application themes generated.")

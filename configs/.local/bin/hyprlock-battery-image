@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+import os
+from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
+
+OUT = Path.home() / ".cache/hyprlock/battery.png"
+OUT.parent.mkdir(parents=True, exist_ok=True)
+
+batteries = list(Path("/sys/class/power_supply").glob("BAT*"))
+if not batteries:
+    raise SystemExit(0)
+
+bat = batteries[0]
+percentage = max(0, min(100, int((bat / "capacity").read_text().strip())))
+status = (bat / "status").read_text().strip()
+charging = status == "Charging"
+# Also detect connected AC power when battery reports Full or Not charging.
+if not charging and status in ("Full", "Not charging"):
+    for supply in Path("/sys/class/power_supply").iterdir():
+        if supply.name.startswith("BAT"):
+            continue
+        online = supply / "online"
+        if online.exists() and online.read_text().strip() == "1":
+            charging = True
+            break
+
+# Draw at 3x resolution for smooth edges.
+S = 3
+W, H = 170, 42
+im = Image.new("RGBA", (W*S, H*S), (0, 0, 0, 0))
+d = ImageDraw.Draw(im)
+
+def rect(box, **kwargs):
+    d.rounded_rectangle(tuple(int(x*S) for x in box), **kwargs)
+
+white = (255, 255, 255, 235)
+fill = (255, 95, 95, 245) if percentage <= 20 and not charging else white
+
+# Battery outline
+rect((2, 6, 45, 31), radius=6*S, outline=white, width=2*S)
+rect((47, 13, 51, 24), radius=2*S, fill=(255, 255, 255, 140))
+
+# Battery level
+width = round(35 * percentage / 100)
+if width:
+    rect((6, 10, 6 + width, 27), radius=min(3, width/2)*S, fill=fill)
+
+# Lightning bolt
+# White lightning bolt with dark outline for contrast.
+
+if charging:
+    points = [
+        (30, 4),    # Top
+        (21, 19),   # Upper-left
+        (26, 19),   # Inner corner
+        (23, 30),   # Bottom
+        (34, 15),   # Lower-right
+        (28, 15),   # Upper-right
+    ]
+
+    scaled = [(x*S, y*S) for x, y in points]
+
+    d.line(
+        scaled + [scaled[0]],
+        fill=(25, 25, 25, 255),
+        width=2*S,
+        joint="curve"
+    )
+    d.polygon(scaled, fill=(255, 255, 255, 255))
+
+
+
+# Percentage
+font_path = "/usr/share/fonts/TTF/DejaVuSans.ttf"
+font = ImageFont.truetype(font_path, 19*S)
+d.text((61*S, 7*S), f"{percentage}%", font=font, fill=white)
+
+im = im.resize((119, 29), Image.Resampling.LANCZOS)
+# Write atomically so Hyprlock never reads a partially written PNG.
+temp = OUT.with_name("battery.tmp.png")
+im.save(temp)
+os.replace(temp, OUT)
+
+print(OUT)

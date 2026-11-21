@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+while pgrep -x hyprlock >/dev/null; do
+    "$HOME/.local/bin/hyprlock-battery-image" >/dev/null
+    sleep 15
+done

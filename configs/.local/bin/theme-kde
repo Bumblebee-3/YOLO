@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+import json
+import colorsys
+import configparser
+from pathlib import Path
+
+home = Path.home()
+pal = json.loads(
+    (home / ".cache/wallpalette/colors.json").read_text()
+)
+
+def rgb(c):
+    c = c.lstrip("#")
+    return tuple(int(c[i:i+2], 16) for i in (0, 2, 4))
+
+def csv(c):
+    return ",".join(map(str, rgb(c)))
+
+def mix(a, b, amount):
+    x, y = rgb(a), rgb(b)
+    return "#" + "".join(
+        f"{round(x[i]*(1-amount)+y[i]*amount):02x}"
+        for i in range(3)
+    )
+
+def dark(c, s=0.65, v=0.09):
+    r, g, b = (x/255 for x in rgb(c))
+    h, _, _ = colorsys.rgb_to_hsv(r, g, b)
+    return "#" + "".join(
+        f"{round(x*255):02x}"
+        for x in colorsys.hsv_to_rgb(h, s, v)
+    )
+
+fg = pal["fg"]
+accent = pal["accent"]
+accent2 = pal["accent2"]
+highlight = pal["highlight"]
+success = pal["warn"]
+
+bg = dark(accent)
+surface = mix(bg, fg, 0.065)
+raised = mix(bg, fg, 0.12)
+muted = mix(fg, bg, 0.45)
+selection_fg = bg
+
+cfg = configparser.ConfigParser(interpolation=None)
+cfg.optionxform = str
+
+cfg["General"] = {
+    "Name": "WallPalette",
+    "ColorScheme": "WallPalette",
+    "shadeSortColumn": "true",
+}
+
+cfg["KDE"] = {
+    "contrast": "4",
+}
+
+for section, background in {
+    "Colors:Window": bg,
+    "Colors:View": bg,
+    "Colors:Button": surface,
+    "Colors:Selection": accent,
+    "Colors:Tooltip": raised,
+    "Colors:Complementary": surface,
+    "Colors:Header": surface,
+}.items():
+    selected = section == "Colors:Selection"
+
+    cfg[section] = {
+        "BackgroundNormal": csv(background),
+        "BackgroundAlternate": csv(surface if not selected else accent2),
+        "ForegroundNormal": csv(selection_fg if selected else fg),
+        "ForegroundInactive": csv(muted),
+        "ForegroundActive": csv(highlight),
+        "ForegroundLink": csv(highlight),
+        "ForegroundVisited": csv(accent2),
+        "ForegroundNegative": csv("#ff455e"),
+        "ForegroundNeutral": csv(highlight),
+        "ForegroundPositive": csv(success),
+        "DecorationFocus": csv(accent),
+        "DecorationHover": csv(highlight),
+    }
+
+cfg["WM"] = {
+    "activeBackground": csv(surface),
+    "activeForeground": csv(fg),
+    "inactiveBackground": csv(bg),
+    "inactiveForeground": csv(muted),
+}
+
+out = home / ".local/share/color-schemes/WallPalette.colors"
+out.parent.mkdir(parents=True, exist_ok=True)
+
+with out.open("w") as f:
+    cfg.write(f, space_around_delimiters=False)
+
+# Update kdeglobals without destroying unrelated settings.
+globals_path = home / ".config/kdeglobals"
+globals_cfg = configparser.ConfigParser(interpolation=None)
+globals_cfg.optionxform = str
+
+if globals_path.exists():
+    globals_cfg.read(globals_path)
+
+if not globals_cfg.has_section("General"):
+    globals_cfg.add_section("General")
+
+globals_cfg["General"]["ColorScheme"] = "WallPalette"
+
+with globals_path.open("w") as f:
+    globals_cfg.write(f, space_around_delimiters=False)
+
+print(f"Generated {out}")
+print(f"Updated {globals_path}")

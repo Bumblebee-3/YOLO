@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -eu
+if [[ ${1:-} == up ]]; then
+    trap 'pkill -RTMIN+20 -x waybar || true' EXIT
+    if command -v paru >/dev/null; then paru -Syu
+    elif command -v yay >/dev/null; then yay -Syu
+    else sudo pacman -Syu; fi
+    if command -v flatpak >/dev/null; then flatpak update; fi
+    exit
+fi
+count=$(checkupdates | wc -l)
+if command -v paru >/dev/null; then aur=$(paru -Qua | wc -l)
+elif command -v yay >/dev/null; then aur=$(yay -Qua | wc -l)
+else aur=0; fi
+flat=0
+if command -v flatpak >/dev/null; then flat=$(flatpak remote-ls --updates --columns=ref | wc -l); fi
+total=$((count + aur + flat))
+label=""
+if ((total)); then label="󰮯 $total"; fi
+jq -nc --arg t "$label" --arg tip "Official $count · AUR $aur · Flatpak $flat" '{text:$t,tooltip:$tip}'

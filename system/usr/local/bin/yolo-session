@@ -1,0 +1,4 @@
+#!/bin/sh
+export PATH="$HOME/.local/bin:$PATH"
+export XDG_CURRENT_DESKTOP=Hyprland
+exec start-hyprland -- --config "$HOME/.config/hypr/hyprland.lua"

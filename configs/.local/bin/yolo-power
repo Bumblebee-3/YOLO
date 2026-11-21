@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eu
+zenbook="$HOME/.config/hypr/scripts/powermode.sh"
+if [[ -x "$zenbook" && -f "$HOME/.config/hypr/zenbook.lua" ]]; then exec "$zenbook" "$@"; fi
+case ${1:-get} in
+    get) profile=$(powerprofilesctl get 2>/dev/null) || exit 0
+         jq -nc --arg profile "$profile" '{text:"󰓅",tooltip:$profile,class:$profile}' ;;
+    toggle) powerprofilesctl set "$(powerprofilesctl list | awk -v active="$(powerprofilesctl get)" '/^[ *]*[a-z-]+:$/ {gsub(/[* :]/,""); modes[++n]=$0; if ($0==active) i=n} END {if(n)print modes[i%n+1]}')" ;;
+esac
