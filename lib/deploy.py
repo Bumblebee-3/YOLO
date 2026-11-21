@@ -38,17 +38,35 @@ def files(source, target):
 
 
 def sddm_config(path):
-    # /etc/sddm.conf overrides the drop-ins. Change conflicting keys in place.
+    # Set both selectors at SDDM's highest configuration priority. A custom
+    # ThemeDir or a later vendor drop-in can otherwise select another greeter.
+    desired = {"Theme": {"Current": "yolo", "ThemeDir": "/usr/share/sddm/themes"},
+               "General": {"InputMethod": "qtvirtualkeyboard"}}
     section = ""
     lines = []
-    for line in path.read_text().splitlines(keepends=True):
+    seen = set()
+
+    def finish_section():
+        for key, value in desired.get(section, {}).items():
+            if (section, key) not in seen:
+                lines.append(f"{key}={value}\n")
+                seen.add((section, key))
+
+    for line in (path.read_text().splitlines() if path.exists() else []):
         header = re.match(r"\s*\[([^]]+)\]", line)
         if header:
+            finish_section()
             section = header[1]
-        key = {"Theme": ("Current", "yolo"), "General": ("InputMethod", "qtvirtualkeyboard")}.get(section)
-        if key and re.match(r"\s*" + key[0] + r"\s*=", line):
-            line = "=".join(key) + "\n"
-        lines.append(line)
+        key = line.partition("=")[0].strip()
+        if "=" in line and key in desired.get(section, {}):
+            line = f"{key}={desired[section][key]}"
+            seen.add((section, key))
+        lines.append(line + "\n")
+    finish_section()
+    for section, keys in desired.items():
+        if not any((section, key) in seen for key in keys):
+            lines.append(f"[{section}]\n")
+            finish_section()
     return "".join(lines).encode()
 
 
@@ -77,7 +95,7 @@ def deploy(name, source):
         if dst.is_symlink():
             raise ValueError(f"Review symlinked SDDM configuration: {dst}")
         data = sddm_config(dst)
-        mode = stat.S_IMODE(dst.stat().st_mode)
+        mode = stat.S_IMODE(dst.stat().st_mode) if dst.exists() else 0o644
     else:
         mode = 0o755 if source.stat().st_mode & 0o111 else 0o644
         if source.is_symlink():
@@ -138,7 +156,7 @@ for line in (repo / "manifest.psv").read_text().splitlines():
 if args.scope == "home" and (repo / "local/home").is_dir():
     for child in sorted((repo / "local/home").iterdir()):
         entries.update(files(child, Path(child.name)))
-if args.scope == "system" and (root / "etc/sddm.conf").exists():
+if args.scope == "system":
     entries[Path("etc/sddm.conf")] = None
 for target, source in entries.items():
     deploy(target, source)

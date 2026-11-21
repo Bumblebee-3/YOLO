@@ -39,7 +39,7 @@ ShellRoot {
         visible: !musicPlaying
         color: "transparent"
         anchors { bottom: true }
-        margins { bottom: 100 }
+        margins { bottom: 48 }
         implicitWidth: screen ? Math.min(800, screen.width * 0.92) : 800
         implicitHeight: heading.implicitHeight + 8 + stats.implicitHeight + 4
         exclusionMode: ExclusionMode.Ignore
