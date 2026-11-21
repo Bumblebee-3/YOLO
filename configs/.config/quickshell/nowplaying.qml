@@ -45,7 +45,7 @@ ShellRoot {
         visible: player !== null && player.isPlaying
         color: "transparent"
         anchors { bottom: true }
-        margins { bottom: 74 } // Waybar (34), visualizer (32), gap (8)
+        margins { bottom: 64 }
         implicitWidth: content.implicitWidth + 2 * pad
         implicitHeight: content.implicitHeight + 2 * pad
         exclusionMode: ExclusionMode.Ignore
