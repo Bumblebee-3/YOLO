@@ -58,3 +58,9 @@ The TahoeBattery QML module and Circle utility are the x86-64 binaries from the 
 2. Run `hyprctl configerrors`, then check audio, brightness, lid toggle and the Waybar keyboard button.
 3. Pick a static wallpaper and an animated one. Check the QuickShell palette, GTK/Qt colors, Fastfetch, Hyprlock, and SDDM on the next logout.
 4. Change one deployed config, run `./install.sh -r`, and confirm the previous contents appear under the printed backup ID.
+
+## Desktop update notifications
+
+Install from a clone of Bumblebee-3/YOLO on main. YOLO records the checkout path, installed commit and selected tiers after a successful install. Existing installations can register by pulling this change and running a full install with their usual tiers once.
+
+The user timer checks GitHub two minutes after the desktop starts and every six hours after a check finishes. Choose **Install update** in the notification to open Kitty. The updater fast-forwards a clean checkout, retrieves LFS media and runs the full installer with your saved tiers, including its normal package upgrade, backup and sudo prompts. Dismissing the notification leaves the update available for the next check. To check immediately, run `~/.local/bin/yolo-update check`. To inspect the timer, run `systemctl --user list-timers yolo-update.timer`.

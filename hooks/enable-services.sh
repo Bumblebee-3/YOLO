@@ -16,9 +16,6 @@ sudo systemctl enable --force sddm.service
 sudo systemctl set-default graphical.target
 systemctl --user daemon-reload
 systemctl --user enable ydotool.service
-if command -v swayosd-server >/dev/null 2>&1; then
-    systemctl --user enable swayosd.service
-fi
 # Preserve existing network management on installed desktops.
 if ! systemctl is-enabled --quiet iwd.service && ! systemctl is-enabled --quiet systemd-networkd.service; then
     sudo systemctl enable NetworkManager.service

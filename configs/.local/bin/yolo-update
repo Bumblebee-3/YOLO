@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+state=${XDG_STATE_HOME:-$HOME/.local/state}/yolo/update
+upstream=https://github.com/Bumblebee-3/YOLO.git
+fail() { printf 'YOLO update: %s\n' "$*" >&2; exit 1; }
+[[ -r $state ]] || fail 'Run install.sh from your YOLO Git clone to register this desktop.'
+mapfile -t settings < "$state"
+repo=${settings[0]}
+installed=${settings[1]}
+cd -- "$repo"
+case "$(git remote get-url origin)" in
+    https://github.com/Bumblebee-3/YOLO|https://github.com/Bumblebee-3/YOLO.git|git@github.com:Bumblebee-3/YOLO.git) ;;
+    *) fail 'Expected origin to point to Bumblebee-3/YOLO.' ;;
+esac
+
+case ${1:-check} in
+    check)
+        export GIT_TERMINAL_PROMPT=0
+        line=$(git ls-remote --exit-code "$upstream" refs/heads/main)
+        revision=${line%%[[:space:]]*}
+        [[ $revision =~ ^[0-9a-f]{40}$ ]] || fail 'Unexpected GitHub revision.'
+        [[ $revision != "$installed" ]] || exit 0
+        if git merge-base --is-ancestor "$revision" "$installed" 2>/dev/null; then exit 0; fi
+        action=$(notify-send --app-name=YOLO --action=install='Install update' \
+            'YOLO desktop update available' "Install main at ${revision:0:8}?")
+        if [[ $action == install ]]; then
+            exec kitty --hold --title 'YOLO update' "$HOME/.local/bin/yolo-update" install "$revision"
+        fi
+        ;;
+    install)
+        revision=${2:-}
+        [[ $revision =~ ^[0-9a-f]{40}$ ]] || fail 'Missing notification revision.'
+        [[ $revision != "$installed" ]] || exit 0
+        exec 8<"$repo"
+        flock -n 8 || fail 'Another update is running.'
+        [[ $(git branch --show-current) == main ]] || fail 'Switch your YOLO checkout to main.'
+        [[ -z $(git status --porcelain) ]] || fail 'Save or stash checkout changes, then check again.'
+        git fetch "$upstream" refs/heads/main
+        [[ $(git rev-parse FETCH_HEAD) == "$revision" ]] || fail 'Main changed. Run yolo-update check again.'
+        git merge-base --is-ancestor HEAD "$revision" || fail 'Local main has separate commits. Reconcile it before updating.'
+        git merge --ff-only "$revision"
+        git lfs pull origin
+        ./install.sh "${settings[@]:2}"
+        notify-send --app-name=YOLO 'YOLO desktop updated' "Installed ${revision:0:8}."
+        ;;
+    *) fail 'Usage: yolo-update check' ;;
+esac

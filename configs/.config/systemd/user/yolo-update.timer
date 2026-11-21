@@ -1,0 +1,6 @@
+[Unit]
+Description=Check GitHub for YOLO updates during the desktop session
+
+[Timer]
+OnActiveSec=2min
+OnUnitInactiveSec=6h

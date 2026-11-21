@@ -28,4 +28,18 @@ if (( ! restore_only )); then install_packages; fi
 if (( ! restore_only )); then build_yolo_swayosd; fi
 restore_config
 run_hooks
+if (( ! plan )) && [[ -z $stage && -e $repo/.git ]]; then
+    state_dir=${XDG_STATE_HOME:-$HOME/.local/state}/yolo
+    mkdir -p "$state_dir"
+    state_tmp=$(mktemp "$state_dir/update.XXXXXX")
+    {
+        printf '%s\n' "$repo" "$(git -C "$repo" rev-parse HEAD)"
+        { printf '%s\n' "${tiers[@]}"; if [[ -f $state_dir/update ]]; then tail -n +3 "$state_dir/update"; fi; } | sort -u
+    } > "$state_tmp"
+    mv -f "$state_tmp" "$state_dir/update"
+    if [[ -n ${WAYLAND_DISPLAY:-} ]]; then
+        systemctl --user import-environment WAYLAND_DISPLAY
+        systemctl --user start yolo-update.timer
+    fi
+fi
 log "Backup ID for replaced files: $run"

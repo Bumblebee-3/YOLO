@@ -1,0 +1,7 @@
+[Unit]
+Description=Check for YOLO desktop updates
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/yolo-update check
+TimeoutStartSec=infinity
