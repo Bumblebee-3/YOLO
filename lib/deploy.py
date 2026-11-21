@@ -53,11 +53,19 @@ def sddm_config(path):
 
 
 def check_parents(path):
+    # Existing desktop setups often link a whole config directory. Follow
+    # those links when they remain inside the selected deployment root.
+    root_resolved = root.resolve()
+    parent_resolved = path.parent.resolve(strict=False)
+    try:
+        parent_resolved.relative_to(root_resolved)
+    except ValueError:
+        raise ValueError(f"Destination parent resolves outside deployment root: {path.parent}")
     for parent in path.parents:
         if parent == root:
             break
-        if parent.is_symlink() or (parent.exists() and not parent.is_dir()):
-            raise ValueError(f"Destination parent is not a plain directory: {parent}")
+        if parent.exists() and not parent.is_dir():
+            raise ValueError(f"Destination parent is not a directory: {parent}")
 
 
 def deploy(name, source):
