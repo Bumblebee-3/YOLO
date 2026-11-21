@@ -32,7 +32,7 @@ Item {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: Math.max(0, Math.round(parent.height * 0.16) - 10)
+        anchors.bottomMargin: Math.max(0, Math.round(parent.height * 0.16) - 70)
 
         // Circular profile picture
         Item {
