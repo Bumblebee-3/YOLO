@@ -11,7 +11,6 @@ ShellRoot {
         id: panel
 
         // ---- tune these ----
-        readonly property real topOffset: screen ? Math.max(90, Math.min(screen.height * 0.56, screen.height - 220)) : 600
         property bool showBackground: false // true = same translucent rounded card as NOW PLAYING
         property int pad: 18
         // --------------------
@@ -39,10 +38,10 @@ ShellRoot {
         readonly property bool musicPlaying: Mpris.players.values.some(p => p.isPlaying)
         visible: !musicPlaying
         color: "transparent"
-        anchors { top: true }
-        margins { top: topOffset }
+        anchors { bottom: true }
+        margins { bottom: 100 }
         implicitWidth: screen ? Math.min(800, screen.width * 0.92) : 800
-        implicitHeight: 27 + 8 + 4 * 23 + 4
+        implicitHeight: heading.implicitHeight + 8 + stats.implicitHeight + 4
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Bottom
         WlrLayershell.namespace: "systemcore"
@@ -113,6 +112,7 @@ ShellRoot {
         }
 
         Column {
+            id: stats
             y: heading.height + 8
             StatRow { label: "CPU";  value: Math.round(panel.cpu) + "%";  fill: panel.cpu
                       labelColor: pal.fg; valueColor: pal.accent; barColor: pal.accent }

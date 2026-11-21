@@ -21,7 +21,6 @@ Item {
     }
 
     // ---- Tahoe login positioning ----
-    property real loginPosition: 0.75
     property int avatarSize: 50
     property int avatarGap: 12
 
@@ -32,8 +31,8 @@ Item {
         height: avatarSize + avatarGap + input.height
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: root.height * loginPosition
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Math.round(parent.height * 0.16)
 
         // Circular profile picture
         Item {
@@ -44,10 +43,16 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
 
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: "#e5e7eb"
+            }
+
             Image {
                 id: avatarImage
                 anchors.fill: parent
-                source: Qt.resolvedUrl("../Assets/tahoe-avatar.png")
+                source: Qt.resolvedUrl("../" + (config.UserIcon || "Assets/default-avatar.png"))
                 fillMode: Image.PreserveAspectCrop
                 sourceSize.width: avatarSize
                 sourceSize.height: avatarSize
@@ -84,7 +89,7 @@ Item {
             id: input
 
             width: parent.width
-            height: root.height * 0.34
+            height: implicitHeight
 
             anchors.top: avatar.bottom
             anchors.topMargin: avatarGap

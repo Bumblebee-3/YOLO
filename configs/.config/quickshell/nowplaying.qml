@@ -11,8 +11,6 @@ ShellRoot {
         id: card
 
         // ---- tune these ----
-        readonly property real topOffset: screen ? Math.max(90, Math.min(screen.height * 0.62, screen.height - 150)) : 665
-        readonly property real leftInset: screen ? Math.max(16, Math.min(screen.width * 0.34, screen.width - 360)) : 275
         readonly property real uiScale: screen ? Math.max(0.72, Math.min(1.15, screen.height / 1080)) : 1
         readonly property real coverSize: 64 * uiScale
         readonly property real pad: 12 * uiScale
@@ -46,10 +44,10 @@ ShellRoot {
 
         visible: player !== null && player.isPlaying
         color: "transparent"
-        anchors { top: true }
-        margins { top: topOffset }
-        implicitWidth: screen ? Math.min(800, screen.width * 0.92) : 800
-        implicitHeight: pad + coverSize + pad
+        anchors { bottom: true }
+        margins { bottom: 136 } // Waybar (34), visualizer (90), gap (12)
+        implicitWidth: content.implicitWidth + 2 * pad
+        implicitHeight: content.implicitHeight + 2 * pad
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Bottom
         WlrLayershell.namespace: "nowplaying"
@@ -83,7 +81,7 @@ ShellRoot {
         }
 
         Row {
-            x: card.leftInset
+            anchors.horizontalCenter: parent.horizontalCenter
             id: content
             y: card.pad
             spacing: 14
