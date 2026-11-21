@@ -78,3 +78,4 @@ pacman-contrib
 gtk4-layer-shell
 ttf-cascadia-code-nerd
 hunspell-en_us
+python-gobject

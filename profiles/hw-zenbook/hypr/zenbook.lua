@@ -29,7 +29,7 @@ local function toggle_flip()
     })
 end
 
-hl.bind("SUPER + R", toggle_flip)
+require("modules.shortcuts").bind("rotate-display", toggle_flip)
 
 
 hl.env("LIBVA_DRIVER_NAME", "iHD")

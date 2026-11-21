@@ -1,0 +1,83 @@
+switch-tiling-layout	Switch tiling layout	SUPER + J
+mirror-configured-phone	Mirror configured phone	code:201
+open-code-editor	Open code editor	SUPER + B
+circle-to-search	Circle to Search	XF86Launch1
+open-terminal	Open terminal	SUPER + Q
+toggle-lid-sleep	Toggle lid sleep	SUPER + I
+open-task-manager	Open task manager	CTRL + SHIFT + Escape
+mirror-android-device	Mirror Android device	SUPER + SHIFT + F23
+close-window	Close window	SUPER + C
+exit-hyprland	Exit Hyprland	SUPER + M
+open-file-manager	Open file manager	SUPER + E
+change-wallpaper	Change wallpaper	SUPER + W
+open-kde-connect	Open KDE Connect	SUPER + SHIFT + M
+toggle-floating	Toggle floating	SUPER + U
+open-clipboard-history	Open clipboard history	SUPER + V
+pick-emoji	Pick emoji	SUPER + period
+open-application-launcher	Open application launcher	SUPER + A
+force-close-window	Force close window	SUPER + k
+toggle-opaque-window	Toggle opaque window	SUPER + O
+open-browser	Open browser	SUPER + F
+capture-region-to-clipboard	Capture region to clipboard	Print
+raise-screen-brightness	Raise screen brightness	XF86MonBrightnessUp
+lower-screen-brightness	Lower screen brightness	XF86MonBrightnessDown
+cycle-keyboard-backlight	Cycle keyboard backlight	XF86KbdBrightnessUp
+raise-volume	Raise volume	XF86AudioRaiseVolume
+lower-volume	Lower volume	XF86AudioLowerVolume
+mute-output	Mute output	XF86AudioMute
+mute-microphone	Mute microphone	XF86AudioMicMute
+send-to-special-workspace	Send to special workspace	SUPER + ALT + S
+toggle-special-workspace	Toggle special workspace	SUPER + S
+move-to-next-relative-workspace	Move to next relative workspace	SUPER + CTRL + ALT + Right
+move-to-previous-relative-workspace	Move to previous relative workspace	SUPER + CTRL + ALT + Left
+move-window-left	Move window left	SUPER + SHIFT + CTRL + left
+move-window-right	Move window right	SUPER + SHIFT + CTRL + right
+move-window-up	Move window up	SUPER + SHIFT + CTRL + up
+move-window-down	Move window down	SUPER + SHIFT + CTRL + down
+pick-screen-color	Pick screen color	SUPER + SHIFT + P
+lock-screen	Lock screen	SUPER + L
+cycle-layout-via-command	Cycle layout via command	SUPER + SHIFT + L
+scroll-to-next-workspace	Scroll to next workspace	SUPER + mouse_down
+scroll-to-previous-workspace	Scroll to previous workspace	SUPER + mouse_up
+drag-window-with-mouse	Drag window with mouse	SUPER + mouse:272
+resize-window-with-mouse	Resize window with mouse	SUPER + mouse:273
+drag-window-with-keyboard	Drag window with keyboard	SUPER + Z
+resize-window-with-keyboard	Resize window with keyboard	SUPER + X
+next-workspace	Next workspace	SUPER + CTRL + Right
+previous-workspace	Previous workspace	SUPER + CTRL + Left
+first-empty-workspace	First empty workspace	SUPER + CTRL + Down
+enlarge-window-horizontally	Enlarge window horizontally	SUPER + SHIFT + Right
+shrink-window-horizontally	Shrink window horizontally	SUPER + SHIFT + Left
+shrink-window-vertically	Shrink window vertically	SUPER + SHIFT + Up
+enlarge-window-vertically	Enlarge window vertically	SUPER + SHIFT + Down
+focus-left	Focus left	SUPER + Left
+focus-right	Focus right	SUPER + Right
+focus-up	Focus up	SUPER + Up
+focus-down	Focus down	SUPER + Down
+cycle-focus	Cycle focus	ALT + Tab
+workspace-1	Focus workspace 1	SUPER + 1
+send-workspace-1	Send window to workspace 1	SUPER + SHIFT + 1
+workspace-2	Focus workspace 2	SUPER + 2
+send-workspace-2	Send window to workspace 2	SUPER + SHIFT + 2
+workspace-3	Focus workspace 3	SUPER + 3
+send-workspace-3	Send window to workspace 3	SUPER + SHIFT + 3
+workspace-4	Focus workspace 4	SUPER + 4
+send-workspace-4	Send window to workspace 4	SUPER + SHIFT + 4
+workspace-5	Focus workspace 5	SUPER + 5
+send-workspace-5	Send window to workspace 5	SUPER + SHIFT + 5
+workspace-6	Focus workspace 6	SUPER + 6
+send-workspace-6	Send window to workspace 6	SUPER + SHIFT + 6
+workspace-7	Focus workspace 7	SUPER + 7
+send-workspace-7	Send window to workspace 7	SUPER + SHIFT + 7
+workspace-8	Focus workspace 8	SUPER + 8
+send-workspace-8	Send window to workspace 8	SUPER + SHIFT + 8
+workspace-9	Focus workspace 9	SUPER + 9
+send-workspace-9	Send window to workspace 9	SUPER + SHIFT + 9
+workspace-10	Focus workspace 10	SUPER + 0
+send-workspace-10	Send window to workspace 10	SUPER + SHIFT + 0
+edit-shortcuts	Customize keybindings	SUPER + SHIFT + K
+record	Start or stop screen recording	-
+record-mic	Record with microphone	-
+record-system	Record with system audio	-
+record-pause	Pause or resume recording	-
+rotate-display	Rotate Zenbook display	SUPER + R

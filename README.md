@@ -78,3 +78,9 @@ UserIcon=Assets/my-avatar.png
 ```
 
 YOLO ships the silhouette in `Assets/default-avatar.png`. Removing the override restores it.
+
+## Keybindings
+
+On your first YOLO login the shortcut editor opens automatically. Press **Win+Shift+K** to reopen it, or run `~/.local/bin/yolo-keybindings`. Search for an action, click its current shortcut, then press the new combination. Mouse buttons and wheel shortcuts can be captured over the recording prompt. **Add keybinding** pairs a name and shell command with a shortcut. **Reset to defaults** asks for confirmation before restoring the built-ins and removing custom actions.
+
+Changes reload Hyprland and are saved in `~/.config/yolo/keybindings.tsv`, outside the installer payload. Screen recording actions start unassigned. Touchscreen gestures are configured separately in the Hyprgrass module.

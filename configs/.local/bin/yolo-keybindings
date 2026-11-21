@@ -1,0 +1,231 @@
+#!/usr/bin/python
+"""Edit the shortcuts registered by the YOLO Hyprland session."""
+import os
+import subprocess
+import sys
+import tempfile
+import uuid
+from pathlib import Path
+
+import gi
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gdk", "4.0")
+from gi.repository import Gdk, Gtk
+
+HOME_DIR = Path.home()
+HYPR = HOME_DIR / ".config/hypr"
+PREFS = HOME_DIR / ".config/yolo/keybindings.tsv"
+SEEN = Path(os.environ.get("XDG_STATE_HOME") or HOME_DIR / ".local/state") / "yolo/keybindings-seen"
+MODS = [(Gdk.ModifierType.SUPER_MASK, "SUPER"), (Gdk.ModifierType.CONTROL_MASK, "CTRL"),
+        (Gdk.ModifierType.ALT_MASK, "ALT"), (Gdk.ModifierType.SHIFT_MASK, "SHIFT")]
+
+
+def write_prefs(rows):
+    PREFS.parent.mkdir(exist_ok=True, parents=True)
+    with tempfile.NamedTemporaryFile(mode="w", dir=PREFS.parent, delete=False) as f:
+        for row in rows.values():
+            print(*row, sep="\t", file=f)
+    os.replace(f.name, PREFS)
+
+
+def signature(key):
+    return frozenset(part.strip().lower() for part in key.split("+"))
+
+
+def padded(box):
+    for side in ("top", "bottom", "start", "end"):
+        getattr(box, "set_margin_" + side)(12)
+    return box
+
+
+class Editor(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id="org.yolo.Keybindings")
+
+    def do_activate(self):
+        if self.get_active_window():
+            self.get_active_window().present()
+            return
+        self.defaults = {}
+        for line in (HYPR / "modules/shortcuts.tsv").read_text().splitlines():
+            ident, label, key = line.split("\t")
+            if ident == "rotate-display" and not (HYPR / "zenbook.lua").exists():
+                continue
+            if ident == "mirror-configured-phone" and not os.getenv("YOLO_ANDROID_DEVICE"):
+                continue
+            self.defaults[ident] = (label, "" if key == "-" else key)
+        self.rows = {}
+        if PREFS.exists():
+            for line in PREFS.read_text().splitlines():
+                fields = line.split("\t")
+                if len(fields) in (2, 4):
+                    self.rows[fields[0]] = fields
+        self.win = Gtk.ApplicationWindow(application=self, title="YOLO Keybindings")
+        self.win.set_default_size(780, 580)
+        header = Gtk.HeaderBar()
+        self.win.set_titlebar(header)
+        for title, callback in [("Reset to defaults", self.reset), ("Add keybinding", self.add)]:
+            button = Gtk.Button(label=title)
+            button.connect("clicked", callback)
+            header.pack_end(button)
+        body = padded(Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8))
+        self.win.set_child(body)
+        self.search = Gtk.SearchEntry()
+        self.search.set_property("placeholder-text", "Search actions or shortcuts")
+        body.append(self.search)
+        self.status = Gtk.Label(xalign=0, wrap=True)
+        body.append(self.status)
+        self.list = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
+        scroll = Gtk.ScrolledWindow(vexpand=True)
+        scroll.set_child(self.list)
+        body.append(scroll)
+        self.search.connect("search-changed", lambda *_: self.refresh())
+        self.refresh()
+        self.win.present()
+        SEEN.parent.mkdir(parents=True, exist_ok=True)
+        SEEN.touch()
+
+    def actions(self):
+        for ident, (name, default) in self.defaults.items():
+            yield ident, name, default, self.rows.get(ident, [ident, default])[1]
+        for ident, row in self.rows.items():
+            if len(row) == 4:
+                yield ident, row[2], "", row[1]
+
+    def refresh(self):
+        while child := self.list.get_first_child():
+            self.list.remove(child)
+        for ident, name, default, current in self.actions():
+            if self.search.get_text().lower() not in f"{name} {default} {current}".lower():
+                continue
+            row = padded(Gtk.Box(spacing=10))
+            labels = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True)
+            labels.append(Gtk.Label(label=name, xalign=0))
+            detail = self.rows[ident][3] if ident.startswith("custom-") else "Default: " + (default or "Unassigned")
+            hint = Gtk.Label(label=detail, xalign=0, wrap=True)
+            hint.add_css_class("dim-label")
+            labels.append(hint)
+            row.append(labels)
+            button = Gtk.Button(label=current or "Set shortcut")
+            button.connect("clicked", lambda _, i=ident, n=name: self.capture(i, n))
+            row.append(button)
+            self.list.append(row)
+
+    def save(self, updated):
+        try:
+            write_prefs(updated)
+            result = subprocess.run(["hyprctl", "reload"], capture_output=True, text=True)
+            if result.returncode:
+                raise RuntimeError(result.stderr or result.stdout or "Hyprland reload failed")
+        except (OSError, RuntimeError) as error:
+            write_prefs(self.rows)
+            self.status.set_text(str(error))
+            return
+        self.rows = updated
+        self.status.set_text("Shortcuts applied.")
+        self.refresh()
+
+    def popup(self, title):
+        win = Gtk.Window(application=self, transient_for=self.win, modal=True, title=title)
+        box = padded(Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10))
+        win.set_child(box)
+        return win, box
+
+    def capture(self, ident, name, command=None):
+        win, box = self.popup(name)
+        tip = Gtk.Label(label="Press a shortcut, or hold modifiers and click or scroll here.")
+        box.append(tip)
+
+        def assign(key, state):
+            chord = " + ".join([label for mask, label in MODS if state & mask] + [key])
+            for other, title, _, current in self.actions():
+                if other != ident and signature(current) == signature(chord):
+                    tip.set_text("Already assigned to " + title + ". Try another shortcut.")
+                    return
+            win.close()
+            row = [ident, chord]
+            if command is not None:
+                row.extend([name, command])
+            elif ident.startswith("custom-"):
+                row.extend(self.rows[ident][2:])
+            self.save({**self.rows, ident: row})
+
+        def pressed(controller, keyval, code, state):
+            event = controller.get_current_event()
+            if event.is_modifier():
+                return True
+            if keyval == Gdk.KEY_Escape and not state:
+                win.close()
+                return True
+            ok, entries, values = win.get_display().map_keycode(code)
+            if ok:
+                keyval = next((v for e, v in zip(entries, values)
+                               if e.group == event.get_layout() and e.level == 0), keyval)
+            assign(Gdk.keyval_name(keyval) or f"code:{code}", state)
+            return True
+
+        keys = Gtk.EventControllerKey()
+        keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        keys.connect("key-pressed", pressed)
+        win.add_controller(keys)
+        click = Gtk.GestureClick(button=0)
+        buttons = {1: 272, 2: 274, 3: 273, 8: 275, 9: 276}
+        def pointer(controller, *_):
+            button = buttons.get(controller.get_current_button())
+            if button:
+                assign(f"mouse:{button}", controller.get_current_event_state())
+        click.connect("pressed", pointer)
+        tip.add_controller(click)
+        scroll = Gtk.EventControllerScroll(flags=Gtk.EventControllerScrollFlags.VERTICAL)
+        def wheel(controller, dx, dy):
+            if dy:
+                assign("mouse_down" if dy > 0 else "mouse_up", controller.get_current_event_state())
+            return True
+        scroll.connect("scroll", wheel)
+        tip.add_controller(scroll)
+        if command is None:
+            clear = Gtk.Button(label="Remove binding" if ident.startswith("custom-") else "Unassign")
+            def remove(_):
+                updated = self.rows.copy()
+                if ident.startswith("custom-"):
+                    updated.pop(ident)
+                else:
+                    updated[ident] = [ident, ""]
+                win.close()
+                self.save(updated)
+            clear.connect("clicked", remove)
+            box.append(clear)
+        win.connect("map", lambda w: w.get_surface().inhibit_system_shortcuts(None))
+        win.present()
+
+    def add(self, _):
+        win, box = self.popup("Add keybinding")
+        name = Gtk.Entry(placeholder_text="Action name")
+        command = Gtk.Entry(placeholder_text="Shell command")
+        button = Gtk.Button(label="Record shortcut")
+        for widget in (name, command, button):
+            box.append(widget)
+        def record(_):
+            fields = [entry.get_text().strip() for entry in (name, command)]
+            if all(fields) and all(not any(c in value for c in "\t\r\n") for value in fields):
+                win.close()
+                self.capture("custom-" + uuid.uuid4().hex, *fields)
+        button.connect("clicked", record)
+        win.present()
+
+    def reset(self, _):
+        win, box = self.popup("Reset to defaults?")
+        box.append(Gtk.Label(label="Restore YOLO shortcuts and remove all custom bindings?"))
+        cancel = Gtk.Button(label="Cancel")
+        cancel.connect("clicked", lambda _: win.close())
+        box.append(cancel)
+        confirm = Gtk.Button(label="Reset to defaults")
+        confirm.connect("clicked", lambda _: (win.close(), self.save({})))
+        box.append(confirm)
+        win.present()
+
+
+if __name__ == "__main__":
+    if "--first-run" in sys.argv and SEEN.exists():
+        sys.exit(0)
+    sys.exit(Editor().run([sys.argv[0]]))
