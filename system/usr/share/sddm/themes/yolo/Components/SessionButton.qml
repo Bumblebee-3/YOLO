@@ -86,7 +86,8 @@ Item {
 
                         text: name
                         color: "white"
-                        font.family: "SF Pro Display"
+                        font.family: "Inter"
+                        font.weight: Font.Black
                         font.pixelSize: 13
                         elide: Text.ElideRight
                         width: parent.width - 30

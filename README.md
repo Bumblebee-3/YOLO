@@ -169,7 +169,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 </div>
 
-<sub>Example from the default Aurora wallpaper. Every wallpaper generates its own set.</sub>
+<sub>Example from the default Northern Lights wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
@@ -293,18 +293,19 @@ YOLO/
 
 <a id="star_history"></a>
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STAR%20HISTORY&repeat=false" alt="STAR HISTORY" />
+
 [![Stargazers over time](https://starchart.cc/Bumblebee-3/YOLO.svg?background=%23081217&axis=%23ebf9ff&line=%230db2ff)](https://starchart.cc/Bumblebee-3/YOLO)
 
 ---
 
 
-### Contributors
+## Contributors
 
 <a href="https://github.com/Bumblebee-3/YOLO/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Bumblebee-3/YOLO" />
 </a>
 
-### Assets and license
+## Assets and license
 
 <a id="credits"></a>
 

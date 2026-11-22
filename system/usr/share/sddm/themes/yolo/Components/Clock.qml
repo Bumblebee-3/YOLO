@@ -13,9 +13,9 @@ Item {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
 
-        font.family: "SF Pro Display"
+        font.family: "Inter"
         font.pixelSize: root.height * 0.028
-        font.bold: true
+        font.weight: Font.Black
 
         color: "#D9F2FF"
         style: Text.Outline
@@ -33,9 +33,9 @@ Item {
         anchors.topMargin: -root.height * 0.008
         anchors.horizontalCenter: parent.horizontalCenter
 
-        font.family: "SF Pro Display"
+        font.family: "Inter"
         font.pixelSize: root.height * 0.145
-        font.bold: true
+        font.weight: Font.Black
 
         color: "#BCE8FF"
         style: Text.Outline

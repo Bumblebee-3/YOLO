@@ -144,9 +144,9 @@ ctx.scale(0.52, 0.52)
         ? "--%"
         : Math.round(battery.percentage) + "%"
 
-    font.family: "SF Pro Display"
+    font.family: "Inter"
+    font.weight: Font.Black
     font.pixelSize: 13
-    font.weight: Font.Medium
 
     color: "white"
 }

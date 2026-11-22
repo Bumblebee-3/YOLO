@@ -156,7 +156,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: "white"
             font.pixelSize: 13
-            font.family: "SF Pro Display"
+            font.family: "Inter"
+            font.weight: Font.Black
         }
 
         MouseArea {
