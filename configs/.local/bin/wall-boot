@@ -3,15 +3,28 @@
 STATIC="$HOME/.cache/wallpalette/hyprlock-wall.png"
 LAST_FILE="$HOME/.cache/wallswitch/last"
 
-# wait (max ~10 s) for awww-daemon to accept commands
-for _ in $(seq 1 100); do
-    awww query >/dev/null 2>&1 && break
-    sleep 0.1
-done
-
 last=$(cat "$LAST_FILE" 2>/dev/null)
 [[ -f "$last" ]] || last="$HOME/animwall/nissan.gif"
 
+# Paint a lightweight layer before starting the animation daemon. The bundled
+# still also covers the first login, when the preview cache is empty.
+still="$last"
+if [[ ${last,,} == *.gif || ! -f $last ]]; then
+    key=$(printf '%s' "$last" | sha256sum)
+    still="${XDG_CACHE_HOME:-$HOME/.cache}/wallswitch/previews/${key%% *}.jpg"
+    [[ -s $still && ! $last -nt $still ]] || still="$HOME/.local/share/yolo/login-wall.jpg"
+fi
+swaybg -m fill -i "$still" &
+still_pid=$!
+awww-daemon --no-cache &
+daemon_pid=$!
+until awww query >/dev/null 2>&1; do
+    kill -0 "$daemon_pid" 2>/dev/null || exit 1
+    sleep 0.05
+done
+# Keep the temporary layer until awww has its own still on every output.
+awww img "$still" --filter Bilinear --transition-type none || exit 1
+kill "$still_pid" 2>/dev/null || :
 [[ -f "$last" ]] || exit 0
 dyn="${last%.*}.dynsky"
 if [[ -f "$dyn/schedule.json" ]]; then

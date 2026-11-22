@@ -1,5 +1,4 @@
 hl.on("hyprland.start", function()
-    hl.exec_cmd("awww-daemon --no-cache")
     hl.exec_cmd("~/.local/bin/wall-boot")
     hl.exec_cmd("hyprpm reload && hyprctl reload")
     hl.exec_cmd("~/.local/share/bin/mpris.sh")
