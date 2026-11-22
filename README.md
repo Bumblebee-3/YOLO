@@ -54,9 +54,6 @@
 
 **YOLO** (Your Own Linux Overhaul) is a wallpaper-driven Hyprland desktop for Arch. Pick a wallpaper, and the bar, launcher, terminal, notifications, lock screen, login screen, GTK/Qt apps and even Firefox all recolor to match.
 
-<!-- TODO: showcase video or GIF. On GitHub you can drag an .mp4 into the editor and paste the generated user-attachments URL on its own line, it embeds as a player. -->
-<https://github.com/user-attachments/assets/REPLACE-ME>
-
 <br>
 
 <a id="installation"></a>
