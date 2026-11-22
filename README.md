@@ -58,8 +58,7 @@
 <br>
 
 <a id="installation"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">INSTALLATION</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=INSTALLATION&repeat=false" alt="INSTALLATION" />
 ---
 
 YOLO targets an **x86-64 Arch Linux** install with a working internet connection, a normal user with `sudo`, and `python`. Other distros are not supported, and the installer refuses to run without `/etc/arch-release`.
@@ -98,14 +97,9 @@ Reboot, then pick **YOLO (Hyprland)** in SDDM.
 > [!NOTE]
 > Want to see exactly what lands where first? `./install.sh --stage "$PWD/local/preview"` writes a full copy into `local/preview/` without touching your system.
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
 
 <a id="features"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">FEATURES</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=FEATURES&repeat=false" alt="FEATURES" />
 ---
 
 <div align="center">
@@ -156,8 +150,7 @@ Checks GitHub every six hours and offers a one-click update in Kitty.
 </div>
 
 <a id="wallpapers"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">WALLPAPERS</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPERS&repeat=false" alt="WALLPAPERS" />
 ---
 
 Press `Super + W` to open the picker. Static images live in `~/.config/yolo/wallpapers/oledwall` and animated GIFs in `~/.config/yolo/wallpapers/animwall`. To bring over a personal collection from an older installation, copy its files into the matching folder. Keep any adjacent `.dynsky` directories with their wallpapers.
@@ -179,8 +172,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 <sub>Example from the default Aurora wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">STYLES</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
 ---
 
 <!-- TODO: swap in real screenshots. Same filenames or edit the paths. -->
@@ -209,8 +201,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 
 <a id="keybindings"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">KEYBINDINGS</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=KEYBINDINGS&repeat=false" alt="KEYBINDINGS" />
 ---
 
 Press `Super + Shift + K` any time to open the keybindings editor. It also opens automatically on your first login.
@@ -234,8 +225,7 @@ Screen recording starts unassigned. Bind `record`, `record-mic`, `record-system`
 
 
 <a id="updating"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">UPDATING</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=UPDATING&repeat=false" alt="UPDATING" />
 ---
 
 YOLO checks GitHub two minutes after login and every six hours after that. Choose **Install update** in the notification to run the updater in Kitty.
@@ -269,8 +259,7 @@ Replace `RUN` with the ID the installer printed. For a broken login screen, swit
 
 
 <a id="contributing"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">CONTRIBUTING</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CONTRIBUTING&repeat=false" alt="CONTRIBUTING" />
 ---
 
 PRs and issues are welcome, whether it is code, testing on different hardware, or docs.
@@ -303,9 +292,7 @@ YOLO/
 
 
 <a id="star_history"></a>
-<a id="installation"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">STAR HISTORY</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STAR%20HISTORY&repeat=false" alt="STAR HISTORY" />
 [![Stargazers over time](https://starchart.cc/Bumblebee-3/YOLO.svg?background=%23081217&axis=%23ebf9ff&line=%230db2ff)](https://starchart.cc/Bumblebee-3/YOLO)
 
 ---
@@ -321,9 +308,7 @@ YOLO/
 
 <a id="credits"></a>
 
-<a id="installation"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">CREDITS</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CREDITS&repeat=false" alt="CREDITS" />
 YOLO is glued together from a lot of excellent projects.
 
 - [Hyprland](https://github.com/hyprwm/Hyprland), Hyprlock, hyprpm
@@ -335,7 +320,8 @@ YOLO is glued together from a lot of excellent projects.
 - [Memoria](https://github.com/Bumblebee-3/memoria) clipboard manager (Bumblebee-3)
 
 <a id="wallpaper-credits"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">WALLPAPER CREDITS</span>
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPER%20CREDITS&repeat=false" alt="WALLPAPER CREDITS" />
+
 A huge thanks to the photographers and creators whose work helps bring YOLO's desktop to life.
 
 The following wallpapers are sourced from [Unsplash](https://unsplash.com) and made available under the [Unsplash License](https://unsplash.com/license).
@@ -352,8 +338,7 @@ The following wallpapers are sourced from [Unsplash](https://unsplash.com) and m
 These wallpapers remain the work of their respective creators and are distributed under the Unsplash License, independently of YOLO's GPL-3.0-or-later software license.
 
 <a id="license"></a>
-<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">LICENSE</span>
-
+<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=LICENSE&repeat=false" alt="LICENSE" />
 YOLO (Your Own Linux Overhaul) is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 Copyright (C) 2026 Bumblebee-3
