@@ -63,8 +63,6 @@
 
 YOLO targets an **x86-64 Arch Linux** install with a working internet connection, a normal user with `sudo`, and `python`. Other distros are not supported, and the installer refuses to run without `/etc/arch-release`.
 
-> [!IMPORTANT]
-> Wallpapers are stored with **Git LFS**. Run `git lfs pull` after cloning or you will get tiny text pointer files instead of images. The collections take about 1.2 GiB in the checkout and another 1.2 GiB once installed.
 
 > [!CAUTION]
 > The installer upgrades your system with pacman, switches your display manager to **SDDM** (effective next boot), installs sudo rules for the greeter theme, and builds SwayOSD from source. Your previous display manager and boot target are recorded in `/var/backups/yolo/RUN/service-state.txt` so you can roll back.
@@ -90,7 +88,7 @@ Reboot, then pick **YOLO (Hyprland)** in SDDM.
 > |---|---|
 > | `core` | Always on. Desktop, greeter, widgets, OSK, wallpapers, recording tools |
 > | `touch` | Hyprgrass gestures + Hyprspace overview |
-> | `hw-zenbook` | Zenbook-only profile (includes `touch`) |
+> | `hw-zenbook` | Zenbook-only profile (Do not use unless you have ux3405CA spec ultra 9 285H, Has specialised power modes for this system, that could potentially break your laptop.) |
 > | `extra` | KDE Connect, scrcpy, Android tools, Memoria clipboard |
 > | `dev` | git, ShellCheck, StyLua |
 
@@ -291,12 +289,6 @@ YOLO/
 </details>
 
 
-<a id="star_history"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STAR%20HISTORY&repeat=false" alt="STAR HISTORY" />
-
-[![Stargazers over time](https://starchart.cc/Bumblebee-3/YOLO.svg?background=%23081217&axis=%23ebf9ff&line=%230db2ff)](https://starchart.cc/Bumblebee-3/YOLO)
-
----
 
 
 ## Contributors
@@ -307,9 +299,10 @@ YOLO/
 
 ## Assets and license
 
+<br>
 <a id="credits"></a>
-
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CREDITS&repeat=false" alt="CREDITS" />
+
 YOLO is glued together from a lot of excellent projects.
 
 - [Hyprland](https://github.com/hyprwm/Hyprland), Hyprlock, hyprpm
@@ -320,6 +313,7 @@ YOLO is glued together from a lot of excellent projects.
 - [cava](https://github.com/karlstav/cava) and its shaders, including work by rezky_nightky and ChunderFPV
 - [Memoria](https://github.com/Bumblebee-3/memoria) clipboard manager (Bumblebee-3)
 
+<br>
 <a id="wallpaper-credits"></a>
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPER%20CREDITS&repeat=false" alt="WALLPAPER CREDITS" />
 
@@ -338,8 +332,10 @@ The following wallpapers are sourced from [Unsplash](https://unsplash.com) and m
 
 These wallpapers remain the work of their respective creators and are distributed under the Unsplash License, independently of YOLO's GPL-3.0-or-later software license.
 
+<br>
 <a id="license"></a>
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=LICENSE&repeat=false" alt="LICENSE" />
+
 YOLO (Your Own Linux Overhaul) is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 Copyright (C) 2026 Bumblebee-3
