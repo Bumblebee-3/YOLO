@@ -26,6 +26,8 @@ animation("specialWorkspace", 6, "slide")
 animation("workspaces", 6, "slide")
 animation("windowsMove", 6)
 animation("border", 4)
+-- Hyprland animates the whole output when it first appears at login.
+hl.animation({ leaf = "monitorAdded", enabled = false })
 
 local borderColors = {
     active = { "rgba(00D2C8ff)", "rgba(8B2FC9ff)" },
