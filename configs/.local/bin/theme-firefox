@@ -2,6 +2,7 @@
 import colorsys
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 HOME = Path.home()
@@ -44,9 +45,7 @@ colors = {
 }
 
 data = {
-    "wallpaper": str(
-        HOME / ".cache/wallpalette/current_wallpaper"
-    ),
+    "wallpaper": sys.argv[1] if len(sys.argv) > 1 else (HOME / ".cache/wallpalette/current_wallpaper").read_text().strip(),
     "alpha": "100",
     "special": {
         "background": bg,

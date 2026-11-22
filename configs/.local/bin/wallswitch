@@ -15,49 +15,13 @@ wallswitch)
         [[ -f $wall ]] || exit 1
         dyn="${wall%.*}.dynsky"
 
-        if [[ -f "$dyn/schedule.json" ]]; then
-            # Dynamic time-of-day wallpaper
-            setsid -f "$BIN/dynsky-run" "$dyn" >/dev/null 2>&1
-        else
-            # Stop dynamic wallpaper scheduler
-            if [[ -s $HOME/.cache/dynsky.pid ]]; then "$BIN/dynsky-run" --stop; fi
-
-            # Apply normal wallpaper
-            "$BIN/wall-show" "$wall" || exit 1
-        fi
-
         printf '%s' "$wall" > "$CACHE/last"
-
-        # Dynamic wallpapers manage their own palette updates
-        if [[ ! -f "$dyn/schedule.json" ]]; then
-            "$BIN/wallpalette" "$wall" || exit 1
+        if [[ -f "$dyn/schedule.json" ]]; then
+            exec "$BIN/dynsky-run" "$dyn"
         fi
-
-        mkdir -p "$HOME/.cache/wallpalette"
-        printf '%s\n' "$wall" > \
-            "$HOME/.cache/wallpalette/current_wallpaper"
-
-        LOCK_WALL="$wall"
-
-        case "${wall,,}" in
-            *.gif|*.webp|*.apng|*.mp4|*.webm|*.mkv)
-                LOCK_WALL="$HOME/.cache/wallpalette/hyprlock-wall.png"
-                ffmpeg -y -loglevel error \
-                    -i "$wall" -frames:v 1 \
-                    "$LOCK_WALL" || exit 1
-                ;;
-        esac
-
-        WALLPAPER="$LOCK_WALL" \
-            "$HOME/.local/bin/theme-hyprlock"
-
-        "$HOME/.local/bin/theme-kitty"
-        "$HOME/.local/bin/theme-apps"
-        "$HOME/.local/bin/theme-kde"
-        "$HOME/.local/bin/theme-sddm" "$wall"
-        command -v pywalfox >/dev/null && "$HOME/.local/bin/theme-firefox"
-
-        exit 0
+        if [[ -s $HOME/.cache/dynsky.pid ]]; then "$BIN/dynsky-run" --stop; fi
+        "$BIN/wall-show" "$wall" || exit 1
+        exec "$BIN/wall-theme" "$wall"
     fi
     GRID='
     window       { width: 66%; height: 76%; }

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+wall=${1:?Expected wallpaper path}
+BIN="$HOME/.local/bin"
+export PATH="$BIN:$PATH"
+
+"$BIN/wallpalette" "$wall" || exit 1
+"$BIN/theme-kitty"
+if command -v pywalfox >/dev/null; then
+    "$BIN/theme-firefox" "$wall"
+fi
+
+mkdir -p "$HOME/.cache/wallpalette"
+printf '%s\n' "$wall" > \
+    "$HOME/.cache/wallpalette/current_wallpaper"
+
+LOCK_WALL="$wall"
+
+case "${wall,,}" in
+    *.gif|*.webp|*.apng|*.mp4|*.webm|*.mkv)
+        LOCK_WALL="$HOME/.cache/wallpalette/hyprlock-wall.png"
+        ffmpeg -y -loglevel error \
+            -i "$wall" -frames:v 1 \
+            "$LOCK_WALL" || LOCK_WALL=""
+        ;;
+esac
+
+if [[ -n $LOCK_WALL ]]; then
+    WALLPAPER="$LOCK_WALL" "$BIN/theme-hyprlock"
+fi
+
+"$HOME/.local/bin/theme-apps"
+"$HOME/.local/bin/theme-kde"
+"$HOME/.local/bin/theme-sddm" "$wall"

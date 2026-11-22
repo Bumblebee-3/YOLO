@@ -27,10 +27,8 @@ def set_wall(path, long_fade):
                 "--transition-type", "fade", "--transition-duration", FADE]
     else:
         args = [os.path.join(os.path.dirname(__file__), "wall-show"), path]
-    subprocess.run(args, check=False)
-    pal = os.path.expanduser("~/.local/bin/wallpalette")
-    if os.path.exists(pal):
-        subprocess.Popen([pal, path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(args, check=True)
+    subprocess.run([os.path.expanduser("~/.local/bin/wall-theme"), path], check=False)
 
 def main():
     if len(sys.argv) < 2:
@@ -50,8 +48,7 @@ def main():
     if sched.get("mode") == "play":
         source = os.path.abspath(os.path.join(d, sched["file"]))
         set_wall(source, long_fade=False)
-        while True:
-            time.sleep(3600)
+        return
 
     import dynsky
     tz = datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600

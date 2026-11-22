@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Restore the selected desktop wallpaper once the background layer is ready.
-STATIC="$HOME/.cache/wallpalette/hyprlock-wall.png"
 LAST_FILE="$HOME/.cache/wallswitch/last"
 
 last=$(cat "$LAST_FILE" 2>/dev/null)
@@ -36,18 +35,10 @@ if [[ $ready != true ]]; then
 fi
 kill "$still_pid" 2>/dev/null || :
 [[ -f "$last" ]] || exit 0
-dyn="${last%.*}.dynsky"
-if [[ -f "$dyn/schedule.json" ]]; then
-    setsid -f "$HOME/.local/bin/dynsky-run" "$dyn" >/dev/null 2>&1
-else
-    "$HOME/.local/bin/wall-show" "$last" || exit 1
-fi
-
-# Populate first-login assets expected by the lock screen and QuickShell.
-if [[ -f "$last" && ! -s "$STATIC" ]]; then
-    mkdir -p "${STATIC%/*}"
-    if ffmpeg -nostdin -loglevel error -y -i "$last" -frames:v 1 "$STATIC"; then
-        "$HOME/.local/bin/wallpalette" "$last" &&
-            WALLPAPER="$STATIC" "$HOME/.local/bin/theme-hyprlock"
-    fi
-fi
+# Use the same cancellable worker as the picker. A subsequent selection
+# replaces the entire restore job, including palette and application updates.
+mkdir -p "${LAST_FILE%/*}"
+request=$(mktemp "${LAST_FILE%/*}/request.XXXXXXXX") || exit 1
+printf '%s' "$last" > "$request" && mv -f -- "$request" "${LAST_FILE%/*}/request" || exit 1
+systemctl --user import-environment WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE
+exec systemctl --user --no-block restart yolo-wallpaper.service
