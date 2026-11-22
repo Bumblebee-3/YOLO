@@ -1,62 +1,71 @@
 #!/usr/bin/env python3
 """wallpalette <image>  -> palette JSON for Quickshell + regenerated conky.conf"""
 import sys, os, json, math, colorsys, subprocess
+from PIL import Image
 
 HOME  = os.path.expanduser("~")
 OUT   = f"{HOME}/.cache/wallpalette/colors.json"
 TMPL  = f"{HOME}/.config/conky/conky.conf.tmpl"
 CONKY = f"{HOME}/.config/conky/conky.conf"
 WAYBAR_DIR = f"{HOME}/.config/waybar"
-DEFAULT = dict(fg="#E0F7FF", accent="#00E5FF", accent2="#00D2C8",
-               warn="#ee4b30", highlight="#fa6ae1")
-
 def hexc(h, s, v):
     r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
     return "#%02x%02x%02x" % (round(r * 255), round(g * 255), round(b * 255))
 
-def hue_dist(a, b):
-    d = abs(a - b) % 1.0
-    return min(d, 1.0 - d)
-
-def dominant_hues(img):
-    raw = subprocess.run(["magick", img + "[0]", "-resize", "64x64!", "-depth", "8", "rgb:-"],
-                         capture_output=True, check=True).stdout
-    bins = [[0.0, 0.0, 0.0] for _ in range(24)]          # weight, sin, cos
-    for i in range(0, len(raw) - 2, 3):
-        h, s, v = colorsys.rgb_to_hsv(raw[i] / 255, raw[i + 1] / 255, raw[i + 2] / 255)
-        if s < 0.25 or v < 0.2:                            # ignore greys and near-black
+def wallpaper_palette(path):
+    size = 128
+    raw = subprocess.run(
+        ["magick", path + "[0]", "-colorspace", "sRGB", "-background", "black",
+         "-alpha", "remove", "-resize", f"{size}x{size}!", "-depth", "8", "rgb:-"],
+        check=True, capture_output=True,
+    ).stdout
+    image = Image.frombytes("RGB", (size, size), raw)
+    clusters = image.quantize(colors=32, dither=Image.Dither.NONE)
+    table = clusters.getpalette()
+    candidates = []
+    for count, index in clusters.getcolors():
+        rgb = [v / 255 for v in table[3 * index:3 * index + 3]]
+        hue, saturation, value = colorsys.rgb_to_hsv(*rgb)
+        chroma = max(rgb) - min(rgb)
+        if count < size * size * 0.004 or chroma < 0.05:
             continue
-        w = s * v
-        k = int(h * 24) % 24
-        bins[k][0] += w
-        bins[k][1] += w * math.sin(2 * math.pi * h)
-        bins[k][2] += w * math.cos(2 * math.pi * h)
-    picks = []
-    for k in sorted(range(24), key=lambda k: -bins[k][0]):
-        w, sn, cs = bins[k]
-        if w <= 0:
-            break
-        h = (math.atan2(sn, cs) / (2 * math.pi)) % 1.0
-        if all(hue_dist(h, p) >= 0.12 for p in picks):     # keep roles visibly different
-            picks.append(h)
-        if len(picks) == 3:
-            break
-    return picks
+        # A lit patch of sky or foliage should compete with a large dark area.
+        weight = math.sqrt(count) * chroma * math.sqrt(value)
+        candidates.append((weight, hue, saturation))
 
-def build(picks):
-    if not picks:
-        return dict(DEFAULT)
-    for off in (0.5, 0.33):                                # fill missing roles
-        if len(picks) < 3:
-            picks.append((picks[0] + off) % 1.0)
-    a, hl, wn = picks
-    return dict(
-        fg=hexc(a, 0.08, 1.0),                             # near-white, tinted by accent
-        accent=hexc(a, 0.95, 1.0),
-        accent2=hexc(a + 0.04, 0.90, 0.82),
-        warn=hexc(wn, 0.80, 0.93),
-        highlight=hexc(hl, 0.60, 1.0),
-    )
+    primary = max(candidates, default=(0, 0, 0))
+
+    def companion(chosen):
+        def score(candidate):
+            _, hue, saturation = candidate
+            distance = min(abs(math.sin(math.pi * (hue - old[1]))) for old in chosen)
+            return candidate[0] * distance * saturation
+        return max(candidates, key=score, default=primary)
+
+    highlight = companion([primary])
+    emphasis = companion([primary, highlight])
+
+    def tone(sample, target, saturation_scale):
+        # Search along the sampled hue for a readable luminance on dark panels.
+        _, hue, saturation = sample
+        # Boost mid-saturation samples while keeping neutral samples neutral.
+        saturation = (1 - (1 - saturation) ** 2) * saturation_scale
+        low, high = 0.0, 1.0
+        for _ in range(12):
+            lightness = (low + high) / 2
+            rgb = colorsys.hls_to_rgb(hue, lightness, saturation)
+            linear = [v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4 for v in rgb]
+            luminance = sum(v * w for v, w in zip(linear, (0.2126, 0.7152, 0.0722)))
+            if luminance < target:
+                low = lightness
+            else:
+                high = lightness
+        return "#%02x%02x%02x" % tuple(round(v * 255) for v in rgb)
+
+    return dict(fg=tone(primary, 0.90, 0.30), accent=tone(primary, 0.42, 1.0),
+                accent2=tone(primary, 0.24, 0.90), highlight=tone(highlight, 0.55, 0.98),
+                warn=tone(emphasis, 0.48, 1.0))
+
 
 def rgba(hexstr, alpha="ff"):
     return f"rgba({hexstr.lstrip('#')}{alpha})"
@@ -581,10 +590,9 @@ def main():
     if len(sys.argv) < 2:
         sys.exit("usage: wallpalette <image>")
     try:
-        pal = build(dominant_hues(sys.argv[1]))
+        pal = wallpaper_palette(sys.argv[1])
     except Exception as e:
-        print("wallpalette: falling back to default palette:", e, file=sys.stderr)
-        pal = dict(DEFAULT)
+        sys.exit(f"wallpalette: cannot sample {sys.argv[1]}: {e}")
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w") as f:                              # in place, so file watchers see it
@@ -619,4 +627,5 @@ def main():
     update_btop(pal)
     print(json.dumps(pal))
 
-main()
+if __name__ == "__main__":
+    main()

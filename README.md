@@ -173,36 +173,15 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 <div align="center">
 
-[![accent](https://placehold.co/130x30/0db2ff/081217?text=accent&font=Oswald)](#wallpapers)
-[![accent2](https://placehold.co/130x30/1568d1/ebf9ff?text=accent2&font=Oswald)](#wallpapers)
-[![highlight](https://placehold.co/130x30/ff7166/081217?text=highlight&font=Oswald)](#wallpapers)
-[![warn](https://placehold.co/130x30/ed6b2f/081217?text=warn&font=Oswald)](#wallpapers)
-[![fg](https://placehold.co/130x30/ebf9ff/081217?text=fg&font=Oswald)](#wallpapers)
+[![accent](https://placehold.co/130x30/0bbfd6/081217?text=accent&font=Oswald)](#wallpapers)
+[![accent2](https://placehold.co/130x30/1194a5/ebf9ff?text=accent2&font=Oswald)](#wallpapers)
+[![highlight](https://placehold.co/130x30/79cdfc/081217?text=highlight&font=Oswald)](#wallpapers)
+[![warn](https://placehold.co/130x30/20c7fc/081217?text=warn&font=Oswald)](#wallpapers)
+[![fg](https://placehold.co/130x30/eef5f6/081217?text=fg&font=Oswald)](#wallpapers)
 
 </div>
 
-<sub>Example from the default Nissan wallpaper. Every wallpaper generates its own set.</sub>
-
-### Sky wallpapers
-
-If a wallpaper has a `.dynsky/` folder next to it, YOLO runs it in time-of-day mode: 16 keyframes anchored to sunrise, noon and sunset for your coordinates, crossfaded over 25 seconds.
-
-```shell
-dynsky-build        my-animated.gif --lat 12.97 --lon 77.59
-dynsky-build-static my-image.png    --lat 12.97 --lon 77.59
-```
-
-<!-- TODO: strip of 4 shots, same scene at morning / noon / sunset / night -->
-<div align="center"><table><tr><td>Morning</td><td>Noon</td><td>Sunset</td><td>Night</td></tr><tr><td>
-<img src="docs/assets/sky_morning.png"/></td><td>
-<img src="docs/assets/sky_noon.png"/></td><td>
-<img src="docs/assets/sky_sunset.png"/></td><td>
-<img src="docs/assets/sky_night.png"/></td></tr></table></div>
-
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
+<sub>Example from the default Aurora wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=STYLES" width="450"/>
@@ -243,7 +222,7 @@ dynsky-build-static my-image.png    --lat 12.97 --lon 77.59
 
 ---
 
-Press `Super + Shift + K` any time to open the editor. It also opens automatically on your first login.
+Press `Super + Shift + K` any time to open the keybindings editor. It also opens automatically on your first login.
 
 <div align="center">
 
@@ -338,9 +317,6 @@ YOLO/
 ```
 
 </details>
-
-> [!NOTE]
-> Desktops with the update notifier follow `main`. Please keep it installable.
 
 <div align="right">
   <br>

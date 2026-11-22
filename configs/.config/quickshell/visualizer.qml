@@ -76,7 +76,7 @@ ShellRoot {
                         height: Math.max(3, ((win.levels[index] ?? 0) / 100) * win.maxHeight)
                         radius: 1.5
                         opacity: win.barOpacity
-                        color: win.mix(pal.accent, pal.highlight, index / Math.max(1, win.bars - 1))
+                        color: win.mix(pal.accent2, pal.highlight, index / Math.max(1, win.bars - 1))
 
                         Behavior on height { NumberAnimation { duration: 60 } }
                     }
