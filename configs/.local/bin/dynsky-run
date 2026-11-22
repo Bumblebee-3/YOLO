@@ -43,6 +43,15 @@ def main():
     open(PID, "w").write(str(os.getpid()))
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
 
+    # Some animated wallpapers are intended to be played as one continuous
+    # source.  Their .dynsky directory is kept for metadata, but it must not
+    # swap the rendered day/night keyframes on top of the animation.
+    if sched.get("mode") == "play":
+        source = os.path.abspath(os.path.join(d, sched["file"]))
+        set_wall(source, long_fade=False)
+        while True:
+            time.sleep(3600)
+
     tz = datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600
     current, first = None, True
     while True:
