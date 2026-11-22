@@ -1,0 +1,8 @@
+[Unit]
+Description=Apply the wallpaper selected in Rofi
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=infinity
+ExecStart=%h/.local/bin/wallswitch --apply

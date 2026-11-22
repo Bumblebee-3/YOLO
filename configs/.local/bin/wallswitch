@@ -10,6 +10,55 @@ case "$(basename "$0")" in
 
 # ── Launcher: ./wallswitch [static|animated] ───────────────────
 wallswitch)
+    if [[ ${1:-} == --apply ]]; then
+        wall=$(<"$CACHE/request")
+        [[ -f $wall ]] || exit 1
+        dyn="${wall%.*}.dynsky"
+
+        if [[ -f "$dyn/schedule.json" ]]; then
+            # Dynamic time-of-day wallpaper
+            setsid -f "$BIN/dynsky-run" "$dyn" >/dev/null 2>&1
+        else
+            # Stop dynamic wallpaper scheduler
+            if [[ -s $HOME/.cache/dynsky.pid ]]; then "$BIN/dynsky-run" --stop; fi
+
+            # Apply normal wallpaper
+            "$BIN/wall-show" "$wall" || exit 1
+        fi
+
+        printf '%s' "$wall" > "$CACHE/last"
+
+        # Dynamic wallpapers manage their own palette updates
+        if [[ ! -f "$dyn/schedule.json" ]]; then
+            "$BIN/wallpalette" "$wall" || exit 1
+        fi
+
+        mkdir -p "$HOME/.cache/wallpalette"
+        printf '%s\n' "$wall" > \
+            "$HOME/.cache/wallpalette/current_wallpaper"
+
+        LOCK_WALL="$wall"
+
+        case "${wall,,}" in
+            *.gif|*.webp|*.apng|*.mp4|*.webm|*.mkv)
+                LOCK_WALL="$HOME/.cache/wallpalette/hyprlock-wall.png"
+                ffmpeg -y -loglevel error \
+                    -i "$wall" -frames:v 1 \
+                    "$LOCK_WALL" || exit 1
+                ;;
+        esac
+
+        WALLPAPER="$LOCK_WALL" \
+            "$HOME/.local/bin/theme-hyprlock"
+
+        "$HOME/.local/bin/theme-kitty"
+        "$HOME/.local/bin/theme-apps"
+        "$HOME/.local/bin/theme-kde"
+        "$HOME/.local/bin/theme-sddm" "$wall"
+        command -v pywalfox >/dev/null && "$HOME/.local/bin/theme-firefox"
+
+        exit 0
+    fi
     GRID='
     window       { width: 66%; height: 76%; }
     entry        { placeholder: "search wallpapers..."; }
@@ -33,65 +82,19 @@ wallswitch-static|wallswitch-animated)
         EXT=(-iname '*.gif')
     fi
 
-    # Rofi calls the script again with the chosen entry; ROFI_INFO holds the full path
-
-if [[ -n $1 ]]; then
-    if [[ -n $ROFI_INFO ]]; then
-        dyn="${ROFI_INFO%.*}.dynsky"
-
-        if [[ -f "$dyn/schedule.json" ]]; then
-            # Dynamic time-of-day wallpaper
-            setsid -f "$BIN/dynsky-run" "$dyn" >/dev/null 2>&1
-        else
-            # Stop dynamic wallpaper scheduler
-            "$BIN/dynsky-run" --stop 2>/dev/null
-
-            # Apply normal wallpaper
-            "$BIN/wall-show" "$ROFI_INFO" >/dev/null 2>&1 || exit 1
-        fi
-
-        printf '%s' "$ROFI_INFO" > "$CACHE/last"
-
-        (
-            # Dynamic wallpapers manage their own palette updates
-            if [[ ! -f "$dyn/schedule.json" ]]; then
-                "$BIN/wallpalette" "$ROFI_INFO" || exit 1
-            fi
-
-            mkdir -p "$HOME/.cache/wallpalette"
-            printf '%s\n' "$ROFI_INFO" > \
-                "$HOME/.cache/wallpalette/current_wallpaper"
-
-            LOCK_WALL="$ROFI_INFO"
-
-            case "${ROFI_INFO,,}" in
-                *.gif|*.webp|*.apng|*.mp4|*.webm|*.mkv)
-                    LOCK_WALL="$HOME/.cache/wallpalette/hyprlock-wall.png"
-                    ffmpeg -y -loglevel error \
-                        -i "$ROFI_INFO" -frames:v 1 \
-                        "$LOCK_WALL" || exit 1
-                    ;;
-            esac
-
-            WALLPAPER="$LOCK_WALL" \
-                "$HOME/.local/bin/theme-hyprlock"
-
-            "$HOME/.local/bin/theme-kitty"
-            "$HOME/.local/bin/theme-apps"
-            "$HOME/.local/bin/theme-kde"
-            "$HOME/.local/bin/theme-sddm" "$ROFI_INFO"
-            command -v pywalfox >/dev/null && "$HOME/.local/bin/theme-firefox"
-
-        ) >/dev/null 2>&1 &
+    if [[ -n ${1:-} ]]; then
+        [[ -f ${ROFI_INFO:-} ]] || exit 0
+        request=$(mktemp "$CACHE/request.XXXXXXXX") || exit 1
+        printf '%s' "$ROFI_INFO" > "$request" && mv -f -- "$request" "$CACHE/request" || exit 1
+        exec systemctl --user --no-block restart yolo-wallpaper.service
     fi
-    exit 0
-fi
 
     while IFS= read -r -d '' f; do
         hash=$(printf '%s' "$f" | md5sum | cut -d' ' -f1)
-        thumb="$CACHE/$hash.png"
-        if [[ ! -f $thumb || $f -nt $thumb ]]; then
-            magick "${f}[0]" -thumbnail 400x400^ -gravity center -extent 400x400 "$thumb" 2>/dev/null
+        thumb="$CACHE/grid-$hash.png"
+        if [[ ! -s $thumb || $f -nt $thumb ]]; then
+            preview=$("$BIN/wall-show" "$f" --preview) || preview="$f"
+            magick "${preview}[0]" -thumbnail 400x400^ -gravity center -extent 400x400 "$thumb" 2>/dev/null
         fi
         printf '%s\0icon\x1f%s\x1finfo\x1f%s\n' "$(basename "$f")" "$thumb" "$f"
     done < <(find "$DIR" -maxdepth 1 -type f \( "${EXT[@]}" \) -print0 | sort -z)

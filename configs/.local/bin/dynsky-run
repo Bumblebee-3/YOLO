@@ -5,7 +5,6 @@ Keeps the wallpaper in sync with the sun: sets the right keyframe now, then cros
 next one when its time comes. DIR is the folder made by dynsky-build. Only one instance runs."""
 import os, sys, json, time, signal, subprocess, datetime
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import dynsky
 
 PID = os.path.expanduser("~/.cache/dynsky.pid")
 FADE = "25"          # seconds of crossfade between keyframes
@@ -13,7 +12,9 @@ FADE = "25"          # seconds of crossfade between keyframes
 def stop_other():
     try:
         pid = int(open(PID).read())
-        if pid != os.getpid():
+        with open(f"/proc/{pid}/cmdline", "rb") as process:
+            argv = process.read().split(b"\0")
+        if os.fsencode(os.path.abspath(__file__)) in argv[:2] and pid != os.getpid():
             os.kill(pid, signal.SIGTERM)
             time.sleep(0.2)
     except (FileNotFoundError, ProcessLookupError, ValueError):
@@ -52,6 +53,7 @@ def main():
         while True:
             time.sleep(3600)
 
+    import dynsky
     tz = datetime.datetime.now().astimezone().utcoffset().total_seconds() / 3600
     current, first = None, True
     while True:
