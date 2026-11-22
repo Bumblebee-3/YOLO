@@ -1,86 +1,388 @@
-# YOLO · Your Own Linux Overhaul
+<a id="top"></a>
 
-YOLO stages and installs a wallpaper-driven Hyprland desktop on x86-64 Arch Linux. The core profile includes Kitty, Dolphin, Waybar, Rofi, SwayNC, SwayOSD, QuickShell widgets and keyboard, Hyprlock, Fastfetch, GTK and Qt palettes, and the YOLO SDDM greeter.
+<div align="center">
 
-## Install on the Dell
+<a href="https://github.com/Bumblebee-3/YOLO/stargazers">
+  <img alt="Stars" src="https://img.shields.io/github/stars/Bumblebee-3/YOLO?style=for-the-badge&logo=github&logoColor=081217&label=STARS&labelColor=0db2ff&color=ff7166">
+</a>
+<a href="https://github.com/Bumblebee-3/YOLO/commits/main">
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/Bumblebee-3/YOLO?style=for-the-badge&logo=git&logoColor=081217&labelColor=0db2ff&color=ff7166">
+</a>
+<a href="LICENSE">
+  <img alt="License" src="https://img.shields.io/github/license/Bumblebee-3/YOLO?style=for-the-badge&labelColor=0db2ff&color=ff7166">
+</a>
 
-Start from a bootable Arch installation with internet access, Python, sudo, and a normal user in a working login session. For the Dell transfer archive, run `tar --zstd -xf YOLO.tar.zst` and `cd YOLO`. You can also copy the project or clone your own remote. For Git clones with LFS-managed media, run `git lfs pull` first. The wallpaper collections occupy about 1.2 GiB in the checkout and another 1.2 GiB in the installed home.
+</div>
 
-```sh
-./install.sh --dry-run
-./install.sh
+###### _<div align="right"><sub>// design by Bumblebee-3</sub></div>_
+
+<!-- TODO: banner, ~1600x600. A clean desktop screenshot with the clock widget and visualizer works great. -->
+![yolo_banner](docs/assets/banner.png)
+
+<div align="center">
+
+<br>
+
+<a href="#installation"><kbd> <br> Installation <br> </kbd></a>&ensp;&ensp;
+<a href="#features"><kbd> <br> Features <br> </kbd></a>&ensp;&ensp;
+<a href="#wallpapers"><kbd> <br> Wallpapers <br> </kbd></a>&ensp;&ensp;
+<a href="#styles"><kbd> <br> Styles <br> </kbd></a>&ensp;&ensp;
+<a href="#keybindings"><kbd> <br> Keybindings <br> </kbd></a>&ensp;&ensp;
+<a href="#updating"><kbd> <br> Updating <br> </kbd></a>&ensp;&ensp;
+<a href="#contributing"><kbd> <br> Contributing <br> </kbd></a>&ensp;&ensp;
+<a href="#credits"><kbd> <br> Credits <br> </kbd></a>
+
+</div><br><br>
+
+<div align="center">
+
+<img alt="Arch" src="https://img.shields.io/badge/Arch_Linux-081217?style=for-the-badge&logo=archlinux&logoColor=0db2ff">
+<img alt="Hyprland" src="https://img.shields.io/badge/Hyprland-081217?style=for-the-badge&logo=hyprland&logoColor=0db2ff">
+<img alt="Quickshell" src="https://img.shields.io/badge/Quickshell-081217?style=for-the-badge&logo=qt&logoColor=ff7166">
+<img alt="Waybar" src="https://img.shields.io/badge/Waybar-081217?style=for-the-badge&logo=wayland&logoColor=ff7166">
+<img alt="Rofi" src="https://img.shields.io/badge/Rofi-081217?style=for-the-badge&logo=gnometerminal&logoColor=0db2ff">
+
+</div>
+
+<br>
+
+**YOLO** (Your Own Linux Overhaul) is a wallpaper-driven Hyprland desktop for Arch. Pick a wallpaper, and the bar, launcher, terminal, notifications, lock screen, login screen, GTK/Qt apps and even Firefox all recolor to match.
+
+<!-- TODO: showcase video or GIF. On GitHub you can drag an .mp4 into the editor and paste the generated user-attachments URL on its own line, it embeds as a player. -->
+<https://github.com/user-attachments/assets/REPLACE-ME>
+
+<br>
+
+<a id="installation"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=INSTALLATION" width="450"/>
+
+---
+
+YOLO targets an **x86-64 Arch Linux** install with a working internet connection, a normal user with `sudo`, and `python`. Other distros are not supported, and the installer refuses to run without `/etc/arch-release`.
+
+> [!IMPORTANT]
+> Wallpapers are stored with **Git LFS**. Run `git lfs pull` after cloning or you will get tiny text pointer files instead of images. The collections take about 1.2 GiB in the checkout and another 1.2 GiB once installed.
+
+> [!CAUTION]
+> The installer upgrades your system with pacman, switches your display manager to **SDDM** (effective next boot), installs sudo rules for the greeter theme, and builds SwayOSD from source. Your previous display manager and boot target are recorded in `/var/backups/yolo/RUN/service-state.txt` so you can roll back.
+
+> [!WARNING]
+> The `hw-zenbook` tier is for the matching ASUS Zenbook only (display scaling, stylus, NumberPad, power limits). Leave it off on any other machine.
+
+```shell
+sudo pacman -S --needed git git-lfs base-devel
+git clone https://github.com/Bumblebee-3/YOLO.git ~/YOLO
+cd ~/YOLO
+git lfs pull
+./install.sh --dry-run   # preview, changes nothing
+./install.sh             # the real thing
 ```
 
-Run the installer as the desktop user. It upgrades Arch with pacman, installs the selected packages, copies the payload and enables SDDM for the next graphical boot. It records the prior display manager and boot target. Reboot and choose **YOLO (Hyprland)** in SDDM. That session starts the bundled Lua config explicitly. The Dell uses its detected displays and power profiles. Leave the Zenbook tier off on the Dell.
+Reboot, then pick **YOLO (Hyprland)** in SDDM.
 
-| Selection | Packages and behavior |
-|---|---|
-| `core` (always included) | Desktop, greeter, widgets, on-screen keyboard, wallpaper collections, recording tools and everyday controls. All packages from Arch repositories. |
-| `touch` | Plugin build dependencies and first-login setup for Hyprgrass and Hyprspace. A Kitty window runs the setup so hyprpm can show its trust and build prompts. |
-| `hw-zenbook` | Includes touch. Adds the original eDP-1 scale, rotation, mapped touchscreen and stylus, UP5401EA NumberPad and four power modes with model-specific limits. Use only on the matching hardware. |
-| `extra` | KDE Connect, scrcpy, Android tools and Memoria clipboard integration. |
-| `dev` | Git, ShellCheck and StyLua for editing the framework. |
+> [!TIP]
+> Want extras? Tiers stack: `./install.sh touch extra dev`
+>
+> | Tier | Adds |
+> |---|---|
+> | `core` | Always on. Desktop, greeter, widgets, OSK, wallpapers, recording tools |
+> | `touch` | Hyprgrass gestures + Hyprspace overview |
+> | `hw-zenbook` | Zenbook-only profile (includes `touch`) |
+> | `extra` | KDE Connect, scrcpy, Android tools, Memoria clipboard |
+> | `dev` | git, ShellCheck, StyLua |
 
-Example for the original laptop: `./install.sh hw-zenbook extra`. A tier with AUR entries uses paru or yay. If neither is installed, the installer builds paru-bin as the invoking user. Package and build prompts remain interactive. Optional browser/editor shortcuts work when their applications are already installed.
+> [!NOTE]
+> Want to see exactly what lands where first? `./install.sh --stage "$PWD/local/preview"` writes a full copy into `local/preview/` without touching your system.
 
-## Restore, customize and recover
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
 
-- Run `git pull` in your clone, then `./install.sh -r` with the same tiers to restore files and enable services. Run a full install when a package list changes. Tiers are additive. Omitting a previously installed tier leaves its files and packages on disk.
-- Preview changes with `./install.sh -r --dry-run hw-zenbook`. To inspect a real copy with no package, service or sudo actions, run `./install.sh --stage "$PWD/local/preview"`. The preview has separate `home/` and `root/` trees.
-- `manifest.psv` maps each tier and repository source to a home or system destination. Directory entries deploy individual files. Before replacing a changed file, YOLO copies the original, including symlinks, into `~/.config/cfg_backups/RUN/` or `/var/backups/yolo/RUN/`. The installer prints the run ID. Re-running the same restore skips matching files. Unrelated neighboring files are preserved.
-- To recover a replaced user file, copy it back from its backup, e.g. `cp -a --remove-destination ~/.config/cfg_backups/RUN/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf`, substituting the printed run ID. Use the matching system backup with sudo for system files. Newly added files have no predecessor. Package upgrades are managed by pacman. For display-manager recovery, use a TTY, inspect `/var/backups/yolo/RUN/service-state.txt`, disable SDDM and enable the recorded previous manager, then restore the recorded default target.
-- Put persistent machine-specific files under `local/home/`, mirroring the home directory. Their versions take precedence on restore. The local folder is Git-ignored. The initial working copy also preserves the pre-conversion project payload in `local/original/`. For distribution, copy the project **excluding local/** or share the tracked tree.
-- Home deployments target the conventional `~/.config` and `~/.local` layout used by these scripts. Parent-directory symlinks require review. File replacements are atomic; an interrupted install can be rerun.
+<a id="features"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=FEATURES" width="450"/>
 
-## Desktop behavior
+---
 
-**Super+Q** opens Kitty, **Super+A** opens the launcher, **Super+W** opens the wallpaper picker, **Super+L** locks, and **Super+E** opens Dolphin. **Super+M** exits Hyprland. KDE Connect uses **Super+Shift+M** to resolve the original duplicate binding. On the Zenbook, **Super+R** rotates the display, touchscreen and stylus together. The keyboard icon in Waybar toggles the QuickShell OSK.
+<div align="center">
+<table>
+<tr>
+<td align="center" width="33%">
+<b>Wallpaper colors</b><br><br>
+One palette extracted from the wallpaper feeds ~12 apps. Change the image, everything follows.
+</td>
+<td align="center" width="33%">
+<b>Sky that tells time</b><br><br>
+<code>dynsky</code> renders the real sun, moon phase and stars for your location and crossfades through the day.
+</td>
+<td align="center" width="33%">
+<b>Touch ready</b><br><br>
+On-screen keyboard, Hyprgrass gestures, bottom-swipe overview, hold-to-confirm power menu.
+</td>
+</tr>
+<tr>
+<td align="center">
+<b>Tahoe-style login</b><br><br>
+Custom SDDM greeter with animated wallpaper, battery, session picker and a virtual keyboard.
+</td>
+<td align="center">
+<b>Screen recorder</b><br><br>
+Region capture with mic or system audio, pause/resume, a REC overlay, and one-click GIF export.
+</td>
+<td align="center">
+<b>Keybinding editor</b><br><br>
+Remap anything from a GUI. Your changes live outside the repo, so updates never clobber them.
+</td>
+</tr>
+<tr>
+<td align="center">
+<b>Safe installer</b><br><br>
+Dry-run, staging, per-file backups, restore mode. Nothing is replaced without a copy.
+</td>
+<td align="center">
+<b>Live widgets</b><br><br>
+QuickShell clock, System Core stats, Now Playing and a cava visualizer, all palette-aware.
+</td>
+<td align="center">
+<b>Update notifier</b><br><br>
+Checks GitHub every six hours and offers a one-click update in Kitty.
+</td>
+</tr>
+</table>
+</div>
 
-The touch setup uses the installed Bumblebee-3 Hyprgrass fork at `3b311c0e694b299844b34ef7935b5aa08772cd45` and Hyprspace at `8345bf6f623d486ca3f87f416ccf1412416eef08`. The reference compositor is Hyprland 0.57.2. Compositor updates may require compatible plugin revisions. After an unsuccessful build or an update, run `~/.local/bin/yolo-plugins` inside Hyprland. Check `hyprpm list` and `hyprctl configerrors`. The OSK and Rofi namespace exclusions, workspace swipe, bottom-edge overview gestures and recording gestures come from the active Lua config. Keyboard shortcuts work independently of the plugins.
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
 
-The generic profile uses an available backlight and the power-profiles daemon. NetworkManager's terminal UI opens from Waybar. To reuse the optional phone key, export `YOLO_ANDROID_DEVICE` with your own adb host and port in the session environment. To use an existing Bibata installation, set `YOLO_CURSOR=Bibata-Modern-Ice`. Adwaita is the bundled profile's cursor default.
+<a id="wallpapers"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=WALLPAPERS" width="450"/>
 
-## Wallpaper and login theme
+---
 
-Static images live in `themes/oledwall/` and animated media in `themes/animwall/`. Matching `.dynsky/` directories include their schedules and rendered keyframes. The scheduler uses the latitude and longitude in each schedule. The wallpaper picker updates the bar, launcher, terminal, notifications, lock screen, Qt/GTK colors and greeter. Firefox integration activates when pywalfox is available. The initial desktop and greeter use the same Nissan GIF.
+Press `Super + W` to open the picker. Static images live in `~/oledwall`, animated GIFs in `~/animwall`.
 
-The installer supplies a separate `yolo` SDDM theme, a Qt virtual keyboard, the Tahoe battery QML module and a YOLO session entry. Existing high-priority `/etc/sddm.conf` theme or input-method keys are updated after backup. The publisher accepts image bytes and a validated palette from the desktop user's narrowly scoped sudo rule. Its output directory and filenames are fixed. The Zenbook-only power helper has its own sudo rule. Bootloader and kernel settings are outside the default manifest.
+Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, btop, Fastfetch, GTK 3/4, Qt 5/6, KDE, Hyprland borders, Hyprlock, SDDM, and Firefox (when [pywalfox](https://github.com/Frewacom/pywalfox) is installed).
 
-The bundled SwayOSD source is the `Bumblebee-3/SwayOSD` fork at commit `95c6fe3`. The installer builds it into `/usr/local` after the package dependencies are installed, then enables its user service. Brightness bindings use SwayOSD's wildcard backlight selection, so they work with different laptop backlight names. SwayOSD requires a network connection the first time it builds its Rust dependencies.
+### Palette from a single image
 
-QuickShell's System Core and Now Playing panels derive their position, width, and scale from the active monitor. The SDDM theme leaves screen dimensions empty so the greeter uses the actual display size. If an older deployed copy still has fixed `ScreenWidth` or `ScreenHeight` values, run `./install.sh -r` to replace it.
+<div align="center">
 
-The TahoeBattery QML module and Circle utility are the x86-64 binaries from the reference system. Greeter testing used SDDM 0.21 and Qt 6.12. The imported greeter theme includes its upstream license. The personal wallpaper and font collection came from the reference machine. Check redistribution rights before publishing those assets. Set up Git LFS before the first commit if hosting this collection on GitHub; individual GIFs exceed GitHub's ordinary file size limit.
+[![accent](https://placehold.co/130x30/0db2ff/081217?text=accent&font=Oswald)](#wallpapers)
+[![accent2](https://placehold.co/130x30/1568d1/ebf9ff?text=accent2&font=Oswald)](#wallpapers)
+[![highlight](https://placehold.co/130x30/ff7166/081217?text=highlight&font=Oswald)](#wallpapers)
+[![warn](https://placehold.co/130x30/ed6b2f/081217?text=warn&font=Oswald)](#wallpapers)
+[![fg](https://placehold.co/130x30/ebf9ff/081217?text=fg&font=Oswald)](#wallpapers)
 
-## Dell smoke test
+</div>
 
-1. Verify SDDM displays the login fields and virtual keyboard. Select YOLO and launch Kitty and Rofi.
-2. Run `hyprctl configerrors`, then check audio, brightness, lid toggle and the Waybar keyboard button.
-3. Pick a static wallpaper and an animated one. Check the QuickShell palette, GTK/Qt colors, Fastfetch, Hyprlock, and SDDM on the next logout.
-4. Change one deployed config, run `./install.sh -r`, and confirm the previous contents appear under the printed backup ID.
+<sub>Example from the default Nissan wallpaper. Every wallpaper generates its own set.</sub>
 
-## Desktop update notifications
+### Sky wallpapers
 
-Install from a clone of Bumblebee-3/YOLO on main. YOLO records the checkout path, installed commit and selected tiers after a successful install. Existing installations can register by pulling this change and running a full install with their usual tiers once.
+If a wallpaper has a `.dynsky/` folder next to it, YOLO runs it in time-of-day mode: 16 keyframes anchored to sunrise, noon and sunset for your coordinates, crossfaded over 25 seconds.
 
-The user timer checks GitHub two minutes after the desktop starts and every six hours after a check finishes. Choose **Install update** in the notification to open Kitty. The updater fast-forwards a clean checkout, retrieves LFS media and runs the full installer with your saved tiers, including its normal package upgrade, backup and sudo prompts. Dismissing the notification leaves the update available for the next check. To check immediately, run `~/.local/bin/yolo-update check`. To inspect the timer, run `systemctl --user list-timers yolo-update.timer`.
-
-### Login avatar
-
-To customize the greeter avatar, place a readable image in
-`/usr/share/sddm/themes/yolo/Assets/` (for example, `my-avatar.png`).
-Set the theme-relative path in
-`/usr/share/sddm/themes/yolo/theme.conf.user`:
-
-```ini
-[General]
-UserIcon=Assets/my-avatar.png
+```shell
+dynsky-build        my-animated.gif --lat 12.97 --lon 77.59
+dynsky-build-static my-image.png    --lat 12.97 --lon 77.59
 ```
 
-YOLO ships the silhouette in `Assets/default-avatar.png`. Removing the override restores it.
+<!-- TODO: strip of 4 shots, same scene at morning / noon / sunset / night -->
+<div align="center"><table><tr><td>Morning</td><td>Noon</td><td>Sunset</td><td>Night</td></tr><tr><td>
+<img src="docs/assets/sky_morning.png"/></td><td>
+<img src="docs/assets/sky_noon.png"/></td><td>
+<img src="docs/assets/sky_sunset.png"/></td><td>
+<img src="docs/assets/sky_night.png"/></td></tr></table></div>
 
-## Keybindings
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
 
-On your first YOLO login the shortcut editor opens automatically. Press **Win+Shift+K** to reopen it, or run `~/.local/bin/yolo-keybindings`. Search for an action, click its current shortcut, then press the new combination. Mouse buttons and wheel shortcuts can be captured over the recording prompt. **Add keybinding** pairs a name and shell command with a shortcut. **Reset to defaults** asks for confirmation before restoring the built-ins and removing custom actions.
+<a id="styles"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=STYLES" width="450"/>
 
-Changes reload Hyprland and are saved in `~/.config/yolo/keybindings.tsv`, outside the installer payload. Screen recording actions start unassigned. Touchscreen gestures are configured separately in the Hyprgrass module.
+---
+
+<!-- TODO: swap in real screenshots. Same filenames or edit the paths. -->
+
+<div align="center"><table><tr><td>Wallpaper Picker</td><td>App Launcher</td></tr><tr><td>
+<img src="docs/assets/wall_picker.png"/></td><td>
+<img src="docs/assets/launcher.png"/></td></tr>
+<tr><td>Emoji Picker</td><td>Notification Center</td></tr><tr><td>
+<img src="docs/assets/emoji.png"/></td><td>
+<img src="docs/assets/notifications.png"/></td></tr>
+</table></div>
+
+<div align="center"><table><tr>Lock &amp; Login</tr><tr><td>
+<img src="docs/assets/lock.png"/></td><td>
+<img src="docs/assets/greeter.png"/></td></tr></table></div>
+
+<div align="center"><table><tr>Touch</tr><tr><td>
+<img src="docs/assets/osk.png"/></td><td>
+<img src="docs/assets/powermenu.png"/></td><td>
+<img src="docs/assets/overview.png"/></td></tr></table></div>
+
+<div align="center"><table><tr>Tools</tr><tr><td>
+<img src="docs/assets/keybind_editor.png"/></td><td>
+<img src="docs/assets/recorder.png"/></td><td>
+<img src="docs/assets/btop_fastfetch.png"/></td></tr></table></div>
+
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
+
+<a id="keybindings"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=KEYBINDINGS" width="450"/>
+
+---
+
+Press `Super + Shift + K` any time to open the editor. It also opens automatically on your first login.
+
+<div align="center">
+
+| Keys | Action | Keys | Action |
+|:---|:---|:---|:---|
+| <kbd>Super</kbd> + <kbd>Q</kbd> | Terminal | <kbd>Super</kbd> + <kbd>W</kbd> | Wallpaper picker |
+| <kbd>Super</kbd> + <kbd>A</kbd> | App launcher | <kbd>Super</kbd> + <kbd>L</kbd> | Lock screen |
+| <kbd>Super</kbd> + <kbd>E</kbd> | File manager | <kbd>Super</kbd> + <kbd>C</kbd> | Close window |
+| <kbd>Super</kbd> + <kbd>F</kbd> | Browser | <kbd>Super</kbd> + <kbd>U</kbd> | Toggle floating |
+| <kbd>Super</kbd> + <kbd>V</kbd> | Clipboard history | <kbd>Super</kbd> + <kbd>J</kbd> | Switch tiling layout |
+| <kbd>Super</kbd> + <kbd>.</kbd> | Emoji picker | <kbd>Super</kbd> + <kbd>1</kbd>..<kbd>0</kbd> | Workspaces |
+| <kbd>Print</kbd> | Region screenshot | <kbd>Super</kbd> + <kbd>S</kbd> | Special workspace |
+| <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd> | Task manager | <kbd>Super</kbd> + <kbd>M</kbd> | Exit Hyprland |
+
+</div>
+
+Screen recording starts unassigned. Bind `record`, `record-mic`, `record-system` and `record-pause` in the editor.
+
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
+
+<a id="updating"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
+
+---
+
+YOLO checks GitHub two minutes after login and every six hours after that. Choose **Install update** in the notification to run the updater in Kitty.
+
+Doing it by hand:
+
+```shell
+cd ~/YOLO
+git pull
+git lfs pull
+./install.sh -r          # restore files only, skips packages
+```
+
+Run a full `./install.sh` (without `-r`) whenever a package list changes. Use the same tiers you installed with.
+
+> [!IMPORTANT]
+> Any config you edited gets overwritten if it is listed in `manifest.psv`. Every replaced file is backed up first to `~/.config/cfg_backups/RUN/` (user) or `/var/backups/yolo/RUN/` (system). Put permanent personal tweaks in `local/home/`, which wins on restore and is git-ignored.
+
+<details>
+<summary><b>Recovering a replaced file</b></summary>
+
+```shell
+cp -a --remove-destination \
+  ~/.config/cfg_backups/RUN/.config/kitty/kitty.conf \
+  ~/.config/kitty/kitty.conf
+```
+
+Replace `RUN` with the ID the installer printed. For a broken login screen, switch to a TTY, read `service-state.txt`, disable SDDM and re-enable your previous manager.
+
+</details>
+
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
+
+<a id="contributing"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=CONTRIBUTING" width="450"/>
+
+---
+
+PRs and issues are welcome, whether it is code, testing on different hardware, or docs.
+
+1. Fork, then branch from `main`.
+2. Install the `dev` tier for ShellCheck and StyLua.
+3. Test with `./install.sh --dry-run` and `--stage` before touching a real system.
+4. New file? Add it to `manifest.psv` under the right tier.
+5. Run `shellcheck` on shell scripts and `stylua` on Lua.
+6. In the PR, say what you changed and what hardware you tested on.
+
+<details>
+<summary><b>Repo layout</b></summary>
+
+```
+YOLO/
+├── install.sh        entry point
+├── manifest.psv      tier -> source -> destination
+├── lib/              installer helpers (deploy.py, pkg.sh, ...)
+├── hooks/            service enabling
+├── pkgs/             package lists per tier
+├── configs/          dotfiles -> ~/.config and ~/.local
+├── profiles/         hw-zenbook, touch, extra
+├── system/           SDDM theme, session entry, sudoers, libexec
+├── themes/           oledwall + animwall
+└── vendor/swayosd    pinned SwayOSD fork
+```
+
+</details>
+
+> [!NOTE]
+> Desktops with the update notifier follow `main`. Please keep it installable.
+
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
+
+<a id="star_history"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=STARS" width="450"/>
+
+[![Stargazers over time](https://starchart.cc/Bumblebee-3/YOLO.svg?background=%23081217&axis=%23ebf9ff&line=%230db2ff)](https://starchart.cc/Bumblebee-3/YOLO)
+
+---
+
+<a id="credits"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=THANK+YOU!" width="450"/>
+
+YOLO is glued together from a lot of excellent projects.
+
+- [Hyprland](https://github.com/hyprwm/Hyprland), Hyprlock, hyprpm
+- [Hyprgrass](https://github.com/horriblename/hyprgrass) (Bumblebee-3 fork) and [Hyprspace](https://github.com/KZDKM/Hyprspace) (KZDKM)
+- [SwayOSD](https://github.com/ErikReider/SwayOSD) by Erik Reider (Bumblebee-3 fork, vendored)
+- [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme) by Keyitdev, built on [Sugar Dark](https://github.com/MarianArlt/sddm-sugar-dark) by MarianArlt
+- [Quickshell](https://quickshell.org), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [rofimoji](https://github.com/fdw/rofimoji), [SwayNC](https://github.com/ErikReider/SwayNotificationCenter), [awww](https://codeberg.org/LGFae/awww), [Kitty](https://github.com/kovidgoyal/kitty)
+- [cava](https://github.com/karlstav/cava) and its shaders, including work by rezky_nightky and ChunderFPV
+- Memoria clipboard manager
+- <!-- TODO: wallpaper artists, font authors, testers -->
+
+<!-- TODO: add a CREDITS.md and link it here once the list grows. -->
+
+### Contributors
+
+<a href="https://github.com/Bumblebee-3/YOLO/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Bumblebee-3/YOLO" />
+</a>
+
+### Assets and license
+
+<!-- TODO: say which wallpapers and fonts are yours, and where SF Pro comes from. Apple's fonts are not freely redistributable. -->
+
+Bundled wallpapers and fonts came from the author's machine. Check redistribution rights before reusing them elsewhere.
+
+Code is released under **GPL-3.0-or-later** (see [LICENSE](LICENSE)). <!-- TODO: add the LICENSE file -->
+
+---
+
+<div align="right">
+  <br>
+  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
+</div>
