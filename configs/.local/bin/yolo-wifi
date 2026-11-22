@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# NetworkManager can use iwd as its own backend; prefer its UI in that case.
+if systemctl is-active --quiet NetworkManager.service; then
+    exec kitty -e nmtui
+fi
+if systemctl is-active --quiet iwd.service; then
+    if command -v iwgtk >/dev/null; then
+        exec iwgtk
+    fi
+    exec kitty -e iwctl
+fi
+exec notify-send "Wi-Fi" "Neither iwd nor NetworkManager is running."

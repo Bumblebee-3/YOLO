@@ -162,7 +162,7 @@
         "format-ethernet": "󰈀",
         "tooltip-format-wifi": "{essid} ({signalStrength}%)",
         "tooltip-format-disconnected": "Disconnected",
-        "on-click": "kitty -e nmtui"
+        "on-click": "~/.local/bin/yolo-wifi"
     },
     "bluetooth": {
         "format": "",

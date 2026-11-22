@@ -25,4 +25,12 @@ fi
 if [[ -s $preview ]]; then
     awww img "$preview" --filter Bilinear --transition-type none || :
 fi
-exec awww img "$wall" --filter Bilinear --transition-type none
+awww img "$wall" --filter Bilinear --transition-type none
+if [[ -n ${XDG_RUNTIME_DIR:-} && -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    pending="$XDG_RUNTIME_DIR/yolo-wall-start-$HYPRLAND_INSTANCE_SIGNATURE"
+    if [[ -d $pending ]]; then
+        # Allow queued buffers to reach the output before uncovering awww.
+        sleep 0.1
+        rmdir -- "$pending" 2>/dev/null || :
+    fi
+fi
