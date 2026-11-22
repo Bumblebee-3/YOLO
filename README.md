@@ -357,11 +357,12 @@ The following wallpapers are sourced from [Unsplash](https://unsplash.com) and m
 
 These wallpapers remain the work of their respective creators and are distributed under the Unsplash License, independently of YOLO's GPL-3.0-or-later software license.
 
-Code is released under **GPL-3.0-or-later** (see [LICENSE](LICENSE)). <!-- TODO: add the LICENSE file -->
+#### License 
 
----
+YOLO (Your Own Linux Overhaul) is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
+Copyright (C) 2026 Bumblebee-3
+
+This project is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License, version 3, or (at your option) any later version.
+
+See the [LICENSE](LICENSE) file for the full license text.
