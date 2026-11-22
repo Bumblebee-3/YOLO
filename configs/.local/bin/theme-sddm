@@ -33,5 +33,9 @@ esac
 
 wall="$STAGING/wallpaper.png"
 [[ -f "$wall" ]] || wall="$STAGING/wallpaper.gif"
-{ jq -ce '{fg,accent,highlight}' "$PALETTE" && cat -- "$wall"; } |
+preview=$(mktemp --suffix=.jpg "$STAGING/preview.XXXXXXXX")
+trap 'rm -f -- "$preview"' EXIT
+ffmpeg -nostdin -loglevel error -y -i "$wall" -frames:v 1 \
+    -vf "scale='min(1280,iw)':-2" -q:v 3 -update 1 "$preview"
+{ jq --argjson preview_bytes "$(stat -c %s "$preview")" -ce '{fg,accent,highlight,preview_bytes:$preview_bytes}' "$PALETTE" && cat -- "$preview" "$wall"; } |
     sudo -n /usr/local/libexec/yolo-sddm-publish

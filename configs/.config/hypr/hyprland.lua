@@ -106,6 +106,7 @@ hl.config({
     -- cursor + font + GTK settings (keeps your selections)
     misc = {
         vrr = 0,
+        background_color = "rgb(081217)",
         disable_hyprland_logo = true,
         disable_splash_rendering = true,
         force_default_wallpaper = 0,

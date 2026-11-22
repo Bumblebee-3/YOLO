@@ -59,6 +59,12 @@ def main():
 
 
     # Preserve animated GIFs; use PNG for static wallpapers.
+    size = palette.get("preview_bytes", 0)
+    if type(size) is not int or not 0 <= size <= 8 * 1024**2:
+        fail("invalid preview size")
+    preview = stream.read(size)
+    if size and (len(preview) != size or not preview.startswith(b"\xff\xd8") or not preview.endswith(b"\xff\xd9")):
+        fail("invalid JPEG preview")
     signature = stream.read(8)
     if signature.startswith((b"GIF87a", b"GIF89a")):
         suffix = ".gif"
@@ -80,6 +86,17 @@ def main():
             os.replace(tmp, bg)
         finally:
             tmp.unlink(missing_ok=True)
+
+    if preview:
+        with tempfile.NamedTemporaryFile(dir=BG_DIR, delete=False) as out:
+            tmp = Path(out.name)
+            try:
+                out.write(preview)
+                out.flush()
+                os.chmod(tmp, 0o644)
+                os.replace(tmp, BG_DIR / "login-preview.jpg")
+            finally:
+                tmp.unlink(missing_ok=True)
 
     contents = CONF.read_text()
 

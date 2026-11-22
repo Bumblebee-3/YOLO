@@ -12,8 +12,11 @@ Column {
 
     function submitLogin() {
         const name = config.AllowUppercaseLettersInUsernames == "false" ? username.text.toLowerCase() : username.text
-        if (name.length && (password.text.length || config.AllowEmptyPassword == "true"))
+        if (!root.startingSession && name.length && (password.text.length || config.AllowEmptyPassword == "true")) {
+            Qt.inputMethod.hide()
+            root.startingSession = true
             sddm.login(name, password.text, tahoeStatus.selectedSession)
+        }
     }
     
     Layout.fillWidth: true
@@ -518,6 +521,8 @@ Column {
         target: sddm
         function onLoginSucceeded() {}
         function onLoginFailed() {
+            root.startingSession = false
+            password.forceActiveFocus()
             failed = true
             resetError.running ? resetError.stop() && resetError.start() : resetError.start()
         }

@@ -19,6 +19,8 @@ Pane {
     LayoutMirroring.enabled: config.RightToLeftLayout == "true" || Qt.application.layoutDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
+    property bool startingSession: false
+
     readonly property url wallpaper: Qt.resolvedUrl(config.Background)
     readonly property bool videoWallpaper: /\.(avi|mp4|mov|mkv|m4v|webm)$/i.test(config.Background)
 
@@ -51,11 +53,26 @@ Pane {
         }
     }
 
+    Image {
+        anchors.fill: parent
+        source: Qt.resolvedUrl("Backgrounds/login-preview.jpg")
+        fillMode: Image.PreserveAspectCrop
+        visible: root.startingSession
+    }
+
+    BusyIndicator {
+        anchors.centerIn: parent
+        visible: root.startingSession
+        running: visible
+    }
+
     LoginForm {
+        visible: !root.startingSession
         anchors.fill: parent
     }
 
     TahoeStatus {
+        visible: !root.startingSession
         id: tahoeStatus
         anchors.top: parent.top
         anchors.right: parent.right
@@ -64,6 +81,7 @@ Pane {
     }
 
     Loader {
+        visible: !root.startingSession
         id: virtualKeyboard
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
