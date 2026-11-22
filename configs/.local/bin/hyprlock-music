@@ -2,9 +2,11 @@
 
 case "$1" in
     title)
+        playerctl status 2>/dev/null | grep -Eq '^(Playing|Paused)$' || exit 0
         playerctl metadata --format '{{title}}' 2>/dev/null | cut -c1-50
         ;;
     artist)
+        playerctl status 2>/dev/null | grep -Eq '^(Playing|Paused)$' || exit 0
         playerctl metadata --format '{{artist}}' 2>/dev/null | cut -c1-50
         ;;
     status)
@@ -14,4 +16,10 @@ case "$1" in
         *)       echo "󰐊" ;;
     esac
     ;;
+    previous)
+        playerctl status 2>/dev/null | grep -Eq '^(Playing|Paused)$' && echo "󰒮"
+        ;;
+    next)
+        playerctl status 2>/dev/null | grep -Eq '^(Playing|Paused)$' && echo "󰒭"
+        ;;
 esac

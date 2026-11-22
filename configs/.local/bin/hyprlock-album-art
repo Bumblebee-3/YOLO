@@ -6,7 +6,15 @@ mkdir -p "$CACHE"
 
 URL=$(playerctl metadata mpris:artUrl 2>/dev/null)
 
-if [[ -z "$URL" ]]; then
+if ! playerctl status 2>/dev/null | grep -Eq '^(Playing|Paused)$' || [[ -z "$URL" ]]; then
+    # Keep the configured image path valid, but clear the old cover when the
+    # player has stopped or disappeared.
+    python - "$ART" <<'PY'
+from pathlib import Path
+from PIL import Image
+import sys
+Image.new("RGBA", (1, 1), (0, 0, 0, 0)).save(Path(sys.argv[1]), "PNG")
+PY
     exit 0
 fi
 
