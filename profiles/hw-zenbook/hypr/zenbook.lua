@@ -1,4 +1,7 @@
-hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.5, bitdepth = 10 })
+local panel_scale = 1.5
+hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = panel_scale, bitdepth = 10 })
+-- The handoff compositor exposes the panel under its Wayland output name.
+hl.monitor({ output = "WAYLAND-1", mode = "preferred", position = "auto", scale = panel_scale })
 local is_flipped = false
 
 local function toggle_flip()
@@ -10,7 +13,7 @@ local function toggle_flip()
         output = "eDP-1",
         mode = "preferred",
         position = "auto",
-        scale = 1.5,
+        scale = panel_scale,
         transform = t,
     })
 

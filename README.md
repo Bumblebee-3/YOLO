@@ -58,7 +58,7 @@
 <br>
 
 <a id="installation"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=INSTALLATION" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">INSTALLATION</span>
 
 ---
 
@@ -104,7 +104,7 @@ Reboot, then pick **YOLO (Hyprland)** in SDDM.
 </div>
 
 <a id="features"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=FEATURES" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">FEATURES</span>
 
 ---
 
@@ -155,13 +155,8 @@ Checks GitHub every six hours and offers a one-click update in Kitty.
 </table>
 </div>
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
-
 <a id="wallpapers"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=WALLPAPERS" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">WALLPAPERS</span>
 
 ---
 
@@ -184,7 +179,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 <sub>Example from the default Aurora wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=STYLES" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">STYLES</span>
 
 ---
 
@@ -214,7 +209,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 
 <a id="keybindings"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=KEYBINDINGS" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">KEYBINDINGS</span>
 
 ---
 
@@ -237,13 +232,9 @@ Press `Super + Shift + K` any time to open the keybindings editor. It also opens
 
 Screen recording starts unassigned. Bind `record`, `record-mic`, `record-system` and `record-pause` in the editor.
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
 
 <a id="updating"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">UPDATING</span>
 
 ---
 
@@ -276,13 +267,9 @@ Replace `RUN` with the ID the installer printed. For a broken login screen, swit
 
 </details>
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
 
 <a id="contributing"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=CONTRIBUTING" width="450"/>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">CONTRIBUTING</span>
 
 ---
 
@@ -314,13 +301,10 @@ YOLO/
 
 </details>
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
 
 <a id="star_history"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=STARS" width="450"/>
+<a id="installation"></a>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">STAR HISTORY</span>
 
 [![Stargazers over time](https://starchart.cc/Bumblebee-3/YOLO.svg?background=%23081217&axis=%23ebf9ff&line=%230db2ff)](https://starchart.cc/Bumblebee-3/YOLO)
 
@@ -336,7 +320,9 @@ YOLO/
 ### Assets and license
 
 <a id="credits"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=THANK+YOU!" width="450"/>
+
+<a id="installation"></a>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">CREDITS</span>
 
 YOLO is glued together from a lot of excellent projects.
 
@@ -348,8 +334,8 @@ YOLO is glued together from a lot of excellent projects.
 - [cava](https://github.com/karlstav/cava) and its shaders, including work by rezky_nightky and ChunderFPV
 - [Memoria](https://github.com/Bumblebee-3/memoria) clipboard manager (Bumblebee-3)
 
-#### Wallpaper Credits
-
+<a id="wallpaper-credits"></a>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">WALLPAPER CREDITS</span>
 A huge thanks to the photographers and creators whose work helps bring YOLO's desktop to life.
 
 The following wallpapers are sourced from [Unsplash](https://unsplash.com) and made available under the [Unsplash License](https://unsplash.com/license).
@@ -365,7 +351,8 @@ The following wallpapers are sourced from [Unsplash](https://unsplash.com) and m
 
 These wallpapers remain the work of their respective creators and are distributed under the Unsplash License, independently of YOLO's GPL-3.0-or-later software license.
 
-#### License 
+<a id="license"></a>
+<span style="font-family: 'Iceland', sans-serif; font-size: 32px; color: #0db2ff; letter-spacing: 2px;">LICENSE</span>
 
 YOLO (Your Own Linux Overhaul) is licensed under the GNU General Public License v3.0 (GPL-3.0).
 

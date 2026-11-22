@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=YOLO (display handoff test)
+Comment=Test the authenticated single-display Xorg handoff
+Exec=/usr/local/libexec/yolo-handoff/session.py
+TryExec=/usr/local/libexec/yolo-handoff/session.py
+Type=Application
+DesktopNames=Hyprland
