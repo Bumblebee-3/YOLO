@@ -1,9 +1,5 @@
-#!/bin/bash
-# Show a static wallpaper instantly at login, then fade to the real (slow-to-load) one.
-#
-#   STATIC    = the still image you already made for hyprlock  <-- set this
-#   LAST_FILE = written by wallswitch every time you pick a wallpaper
-
+#!/usr/bin/env bash
+# Restore the selected desktop wallpaper once the background layer is ready.
 STATIC="$HOME/.cache/wallpalette/hyprlock-wall.png"
 LAST_FILE="$HOME/.cache/wallswitch/last"
 
@@ -16,26 +12,12 @@ done
 last=$(cat "$LAST_FILE" 2>/dev/null)
 [[ -f "$last" ]] || last="$HOME/animwall/nissan.gif"
 
-# 1. instant placeholder (only worth it if the real wallpaper is a different, heavier file)
-if [ -f "$STATIC" ] && [ "$last" != "$STATIC" ]; then
-    awww img "$STATIC" --transition-type none
-fi
-
-# 2. the real wallpaper: the daemon decodes it in the background and swaps it in with a fade
-
-if [ -n "$last" ] && [ -f "$last" ]; then
-    dyn="${last%.*}.dynsky"
-
-    if [ -f "$dyn/schedule.json" ]; then
-        # Restart the dynamic wallpaper scheduler
-        setsid -f "$HOME/.local/bin/dynsky-run" "$dyn" >/dev/null 2>&1
-    else
-        # Restore normal wallpaper
-        sleep 0.5
-        awww img "$last" \
-            --transition-type fade \
-            --transition-duration 1.5
-    fi
+[[ -f "$last" ]] || exit 0
+dyn="${last%.*}.dynsky"
+if [[ -f "$dyn/schedule.json" ]]; then
+    setsid -f "$HOME/.local/bin/dynsky-run" "$dyn" >/dev/null 2>&1
+else
+    "$HOME/.local/bin/wall-show" "$last" || exit 1
 fi
 
 # Populate first-login assets expected by the lock screen and QuickShell.

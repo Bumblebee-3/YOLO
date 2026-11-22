@@ -20,9 +20,12 @@ def stop_other():
         pass
 
 def set_wall(path, long_fade):
-    # long crossfade between keyframes while running; short one for the very first set (login / switch)
-    args = ["awww", "img", path, "--transition-type", "fade",
-            "--transition-duration", FADE if long_fade else "1.5"]
+    # long crossfade between keyframes while running; show the matching still first at login or on selection
+    if long_fade:
+        args = ["awww", "img", path, "--filter", "Bilinear",
+                "--transition-type", "fade", "--transition-duration", FADE]
+    else:
+        args = [os.path.join(os.path.dirname(__file__), "wall-show"), path]
     subprocess.run(args, check=False)
     pal = os.path.expanduser("~/.local/bin/wallpalette")
     if os.path.exists(pal):
