@@ -1,6 +1,6 @@
 # YOLO · Your Own Linux Overhaul
 
-YOLO stages and installs a wallpaper-driven Hyprland desktop on x86-64 Arch Linux. The core profile includes Kitty, Dolphin, Waybar, Rofi, SwayNC, SwayOSD, QuickShell widgets and keyboard, Hyprlock, Fastfetch, GTK and Qt palettes, and the customized Astronaut SDDM greeter.
+YOLO stages and installs a wallpaper-driven Hyprland desktop on x86-64 Arch Linux. The core profile includes Kitty, Dolphin, Waybar, Rofi, SwayNC, SwayOSD, QuickShell widgets and keyboard, Hyprlock, Fastfetch, GTK and Qt palettes, and the YOLO SDDM greeter.
 
 ## Install on the Dell
 
@@ -70,7 +70,7 @@ The user timer checks GitHub two minutes after the desktop starts and every six 
 To customize the greeter avatar, place a readable image in
 `/usr/share/sddm/themes/yolo/Assets/` (for example, `my-avatar.png`).
 Set the theme-relative path in
-`/usr/share/sddm/themes/yolo/Themes/astronaut.conf.user`:
+`/usr/share/sddm/themes/yolo/theme.conf.user`:
 
 ```ini
 [General]

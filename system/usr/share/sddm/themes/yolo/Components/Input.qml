@@ -9,16 +9,20 @@ import QtQuick.Controls 2.15
 
 Column {
     id: inputContainer
+
+    function submitLogin() {
+        const name = config.AllowUppercaseLettersInUsernames == "false" ? username.text.toLowerCase() : username.text
+        if (name.length && (password.text.length || config.AllowEmptyPassword == "true"))
+            sddm.login(name, password.text, tahoeStatus.selectedSession)
+    }
     
     Layout.fillWidth: true
 
-    property ComboBox exposeSession: tahoeStatus.exposeSession
     property bool failed
 
     Item {
         id: errorMessageField
 
-        // change also in selectSession
         height: root.font.pointSize * 2
         width: parent.width / 2
         anchors.horizontalCenter: parent.horizontalCenter
@@ -242,7 +246,7 @@ Column {
                 radius: config.RoundCorners || 0
             }
             
-            onAccepted: config.AllowUppercaseLettersInUsernames == "false" ? sddm.login(username.text.toLowerCase(), password.text, tahoeStatus.selectedSession) : sddm.login(username.text, password.text, tahoeStatus.selectedSession)
+            onAccepted: submitLogin()
             KeyNavigation.down: passwordIcon
 
             states: [
@@ -369,7 +373,7 @@ Column {
                 border.width: parent.activeFocus ? 2 : 1
                 radius: config.RoundCorners || 0
             }
-            onAccepted: config.AllowUppercaseLettersInUsernames == "false" ? sddm.login(username.text.toLowerCase(), password.text, tahoeStatus.selectedSession) : sddm.login(username.text, password.text, tahoeStatus.selectedSession)
+            onAccepted: submitLogin()
             KeyNavigation.down: loginButton
         }
 
@@ -502,7 +506,7 @@ Column {
                 }
             ]
 
-            onClicked: config.AllowUppercaseLettersInUsernames == "false" ? sddm.login(username.text.toLowerCase(), password.text, tahoeStatus.selectedSession) : sddm.login(username.text, password.text, tahoeStatus.selectedSession)
+            onClicked: submitLogin()
             Keys.onReturnPressed: clicked()
             Keys.onEnterPressed: clicked()
             

@@ -96,9 +96,4 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
-
-    // Compatibility aliases
-    property var sessionSelect: tahoeStatus.exposeSession
-    property var systemButtons: null
-    property var virtualKeyboardButton: null
 }

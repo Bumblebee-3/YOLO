@@ -78,7 +78,7 @@ Item {
     }
 
     // Expose session ComboBox to the login form
-    property alias exposeSession: sessionSelect.exposeSession
+    readonly property int selectedSession: sessionSelect.selectedSession
 
     Popup {
         id: powerMenu

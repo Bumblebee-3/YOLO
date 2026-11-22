@@ -1,15 +1,13 @@
 [SddmGreeterTheme]
-Name=YOLO Astronaut
-Description=sddm-astronaut-theme
-Author=keyitdev
-Website=https://github.com/Keyitdev/sddm-astronaut-theme
+Name=YOLO
+Description=Wallpaper-driven login screen for Your Own Linux Overhaul
+Author=YOLO contributors
+Website=https://github.com/Bumblebee-3/YOLO
 License=GPL-3.0-or-later
 Type=sddm-theme
-Version=1.3
-ConfigFile=Themes/astronaut.conf
-Screenshot=Previews/astronaut.png
+Version=2.0
+ConfigFile=theme.conf
 MainScript=Main.qml
-TranslationsDirectory=translations
 Theme-Id=yolo
 Theme-API=2.0
 QtVersion=6

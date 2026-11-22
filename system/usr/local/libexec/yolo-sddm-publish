@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 
 THEME = Path("/usr/share/sddm/themes/yolo")
-CONF = THEME / "Themes/astronaut.conf"
+CONF = THEME / "theme.conf"
 BG_DIR = THEME / "Backgrounds"
 
 def fail(message):
@@ -85,10 +85,7 @@ def main():
 
     settings = {
         "Background": f"Backgrounds/{bg.name}",
-        "BackgroundPlaceholder": "",
         "BackgroundColor": dark,
-        "FormBackgroundColor": dark,
-        "DimBackgroundColor": dark,
         "LoginFieldBackgroundColor": dark,
         "PasswordFieldBackgroundColor": dark,
         "LoginButtonBackgroundColor": accent,
@@ -113,7 +110,7 @@ def main():
     finally:
         temp_conf.unlink(missing_ok=True)
 
-    print("SDDM Astronaut wallpaper and colors updated.")
+    print("YOLO greeter wallpaper and colors updated.")
 
 if __name__ == "__main__":
     main()

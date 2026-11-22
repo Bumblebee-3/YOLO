@@ -10,7 +10,6 @@ Item {
 
     // Preserve the properties expected by Input.qml
     property int selectedSession: selectSession.currentIndex
-    property ComboBox exposeSession: selectSession
 
     // Functional session model and selection
     ComboBox {

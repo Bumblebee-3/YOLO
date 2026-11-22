@@ -158,5 +158,12 @@ if args.scope == "home" and (repo / "local/home").is_dir():
         entries.update(files(child, Path(child.name)))
 if args.scope == "system":
     entries[Path("etc/sddm.conf")] = None
+    theme = Path("usr/share/sddm/themes/yolo")
+    override = theme / "theme.conf.user"
+    legacy = root / theme / "Themes/astronaut.conf.user"
+    if theme / "theme.conf" in entries and not os.path.lexists(root / override):
+        check_parents(legacy)
+        if legacy.is_file() and not legacy.is_symlink():
+            entries[override] = legacy
 for target, source in entries.items():
     deploy(target, source)
