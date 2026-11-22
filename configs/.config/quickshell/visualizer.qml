@@ -13,7 +13,7 @@ ShellRoot {
         // ---- tune these ----
         property int bars: 48              // must match "bars" in cava-viz.conf
         property int barSpacing: 3
-        property int maxHeight: 32
+        property int maxHeight: 48
         property int bottomOffset: 34      // sit just above waybar (32px) - raise/lower to taste
         property real barOpacity: 0.4
         property bool onlyWhilePlaying: true

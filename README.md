@@ -17,6 +17,8 @@
 ###### _<div align="right"><sub>// design by Bumblebee-3</sub></div>_
 
 <!-- TODO: banner, ~1600x600. A clean desktop screenshot with the clock widget and visualizer works great. -->
+
+![alt text](image.png)
 ![yolo_banner](docs/assets/banner.png)
 <div align="center">
 
@@ -173,29 +175,48 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
 ---
 
-<!-- TODO: swap in real screenshots. Same filenames or edit the paths. -->
+<div align="center">
 
-<div align="center"><table><tr><td>Wallpaper Picker</td><td>App Launcher</td></tr><tr><td>
-<img src="docs/assets/wall_picker.png"/></td><td>
-<img src="docs/assets/launcher.png"/></td></tr>
-<tr><td>Emoji Picker</td><td>Notification Center</td></tr><tr><td>
-<img src="docs/assets/emoji.png"/></td><td>
-<img src="docs/assets/notifications.png"/></td></tr>
-</table></div>
+<img src="assets/images/desktop.png" alt="YOLO desktop" width="49%">
+&nbsp;
+<img src="assets/images/wallpaper.png" alt="Wallpaper picker" width="49%">
 
-<div align="center"><table><tr>Lock &amp; Login</tr><tr><td>
-<img src="docs/assets/lock.png"/></td><td>
-<img src="docs/assets/greeter.png"/></td></tr></table></div>
+<sub><b>Desktop</b> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Wallpaper picker</b></sub>
 
-<div align="center"><table><tr>Touch</tr><tr><td>
-<img src="docs/assets/osk.png"/></td><td>
-<img src="docs/assets/powermenu.png"/></td><td>
-<img src="docs/assets/overview.png"/></td></tr></table></div>
+</div>
 
-<div align="center"><table><tr>Tools</tr><tr><td>
-<img src="docs/assets/keybind_editor.png"/></td><td>
-<img src="docs/assets/recorder.png"/></td><td>
-<img src="docs/assets/btop_fastfetch.png"/></td></tr></table></div>
+
+<div align="center">
+
+<img src="assets/images/hyprlock.png" alt="Hyprlock screen" width="49%">
+&nbsp;
+<img src="assets/images/sddm.png" alt="SDDM login screen" width="49%">
+
+<sub><b>Hyprlock</b> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Login screen</b></sub>
+
+</div>
+
+
+<div align="center">
+
+<img src="assets/images/app-picker.png" alt="Application picker" width="49%">
+&nbsp;
+<img src="assets/images/notif.png" alt="Notification center" width="49%">
+
+<sub><b>Application picker</b> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Notification center</b></sub>
+
+</div>
+
+
+<div align="center">
+
+<img src="assets/images/powerOptions.png" alt="Power menu" width="49%">
+&nbsp;
+<img src="assets/images/memoria-fastfetch.png" alt="Memoria and Fastfetch" width="49%">
+
+<sub><b>Power menu</b> &nbsp;&nbsp;·&nbsp;&nbsp; <b>Memoria &amp; system tools</b></sub>
+
+</div>
 
 
 <a id="keybindings"></a>
