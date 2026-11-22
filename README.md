@@ -18,21 +18,25 @@
 
 <!-- TODO: banner, ~1600x600. A clean desktop screenshot with the clock widget and visualizer works great. -->
 ![yolo_banner](docs/assets/banner.png)
-
 <div align="center">
 
 <br>
 
-<a href="#installation"><kbd> <br> Installation <br> </kbd></a>&ensp;&ensp;
-<a href="#features"><kbd> <br> Features <br> </kbd></a>&ensp;&ensp;
-<a href="#wallpapers"><kbd> <br> Wallpapers <br> </kbd></a>&ensp;&ensp;
-<a href="#styles"><kbd> <br> Styles <br> </kbd></a>&ensp;&ensp;
-<a href="#keybindings"><kbd> <br> Keybindings <br> </kbd></a>&ensp;&ensp;
-<a href="#updating"><kbd> <br> Updating <br> </kbd></a>&ensp;&ensp;
-<a href="#contributing"><kbd> <br> Contributing <br> </kbd></a>&ensp;&ensp;
-<a href="#credits"><kbd> <br> Credits <br> </kbd></a>
+<a href="#installation"><img alt="Installation" src="https://img.shields.io/badge/01-INSTALLATION-081217?style=for-the-badge&labelColor=0db2ff"></a>
+<a href="#features"><img alt="Features" src="https://img.shields.io/badge/02-FEATURES-081217?style=for-the-badge&labelColor=0db2ff"></a>
+<a href="#wallpapers"><img alt="Wallpapers" src="https://img.shields.io/badge/03-WALLPAPERS-081217?style=for-the-badge&labelColor=0db2ff"></a>
+<a href="#styles"><img alt="Styles" src="https://img.shields.io/badge/04-STYLES-081217?style=for-the-badge&labelColor=0db2ff"></a>
+<br>
+<a href="#keybindings"><img alt="Keybindings" src="https://img.shields.io/badge/05-KEYBINDINGS-081217?style=for-the-badge&labelColor=ff7166"></a>
+<a href="#updating"><img alt="Updating" src="https://img.shields.io/badge/06-UPDATING-081217?style=for-the-badge&labelColor=ff7166"></a>
+<a href="#contributing"><img alt="Contributing" src="https://img.shields.io/badge/07-CONTRIBUTING-081217?style=for-the-badge&labelColor=ff7166"></a>
+<a href="#credits"><img alt="Credits" src="https://img.shields.io/badge/08-CREDITS-081217?style=for-the-badge&labelColor=ff7166"></a>
 
-</div><br><br>
+<br>
+
+</div>
+
+
 
 <div align="center">
 
@@ -350,21 +354,6 @@ YOLO/
 
 ---
 
-<a id="credits"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=THANK+YOU!" width="450"/>
-
-YOLO is glued together from a lot of excellent projects.
-
-- [Hyprland](https://github.com/hyprwm/Hyprland), Hyprlock, hyprpm
-- [Hyprgrass](https://github.com/horriblename/hyprgrass) (Bumblebee-3 fork) and [Hyprspace](https://github.com/KZDKM/Hyprspace) (KZDKM)
-- [SwayOSD](https://github.com/ErikReider/SwayOSD) by Erik Reider (Bumblebee-3 fork, vendored)
-- [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme) by Keyitdev, built on [Sugar Dark](https://github.com/MarianArlt/sddm-sugar-dark) by MarianArlt
-- [Quickshell](https://quickshell.org), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [rofimoji](https://github.com/fdw/rofimoji), [SwayNC](https://github.com/ErikReider/SwayNotificationCenter), [awww](https://codeberg.org/LGFae/awww), [Kitty](https://github.com/kovidgoyal/kitty)
-- [cava](https://github.com/karlstav/cava) and its shaders, including work by rezky_nightky and ChunderFPV
-- Memoria clipboard manager
-- <!-- TODO: wallpaper artists, font authors, testers -->
-
-<!-- TODO: add a CREDITS.md and link it here once the list grows. -->
 
 ### Contributors
 
@@ -374,9 +363,23 @@ YOLO is glued together from a lot of excellent projects.
 
 ### Assets and license
 
-<!-- TODO: say which wallpapers and fonts are yours, and where SF Pro comes from. Apple's fonts are not freely redistributable. -->
 
-Bundled wallpapers and fonts came from the author's machine. Check redistribution rights before reusing them elsewhere.
+#### Wallpaper Credits
+
+A huge thanks to the photographers and creators whose work helps bring YOLO's desktop to life.
+
+The following wallpapers are sourced from [Unsplash](https://unsplash.com) and made available under the [Unsplash License](https://unsplash.com/license).
+
+| Filename | Wallpaper | Creator | Source |
+|:---|:---|:---|:---|
+| `eclipse.jpg` | Solar Eclipse | Bryan Goff | [Unsplash](https://unsplash.com/photos/we1ky8_ZTHg) |
+| `smoke-silhouette.jpg` | Silhouette with Smoke | Aziz Acharki | [Unsplash](https://unsplash.com/photos/7nsqPSnYCoY) |
+| `northern-lights.jpg` | Northern Lights | Jonatan Pie | [Unsplash](https://unsplash.com/photos/3l3RwQdHRHg) |
+| `outer-space.jpg` | Outer Space | NASA | [Unsplash](https://unsplash.com/photos/Q1p7bh3SHj8) |
+| `starry-silhouette.jpg` | Silhouette Under the Stars | Greg Rakozy | [Unsplash](https://unsplash.com/photos/oMpAz-DN-9I) |
+| `molten-lava.jpg` | Molten Lava - Kalapana | Buzz Andersen | [Unsplash](https://unsplash.com/photos/E4944K_4SvI) |
+
+These wallpapers remain the work of their respective creators and are distributed under the Unsplash License, independently of YOLO's GPL-3.0-or-later software license.
 
 Code is released under **GPL-3.0-or-later** (see [LICENSE](LICENSE)). <!-- TODO: add the LICENSE file -->
 
