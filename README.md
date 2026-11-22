@@ -3,23 +3,18 @@
 <div align="center">
 
 <a href="https://github.com/Bumblebee-3/YOLO/stargazers">
-  <img alt="Stars" src="https://img.shields.io/github/stars/Bumblebee-3/YOLO?style=for-the-badge&logo=github&logoColor=081217&label=STARS&labelColor=0db2ff&color=ff7166">
+  <img alt="Stars" src="https://img.shields.io/github/stars/Bumblebee-3/YOLO?style=for-the-badge&logo=github&logoColor=081217&label=STARS&labelColor=0db2ff&color=ff7166&idk">
 </a>
 <a href="https://github.com/Bumblebee-3/YOLO/commits/main">
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/Bumblebee-3/YOLO?style=for-the-badge&logo=git&logoColor=081217&labelColor=0db2ff&color=ff7166">
 </a>
 <a href="LICENSE">
-  <img alt="License" src="https://img.shields.io/github/license/Bumblebee-3/YOLO?style=for-the-badge&labelColor=0db2ff&color=ff7166">
+  <img alt="License" src="https://img.shields.io/github/license/Bumblebee-3/YOLO?style=for-the-badge&labelColor=0db2ff&color=ff7166&idk">
 </a>
 
 </div>
 
-###### _<div align="right"><sub>// design by Bumblebee-3</sub></div>_
 
-<!-- TODO: banner, ~1600x600. A clean desktop screenshot with the clock widget and visualizer works great. -->
-
-![alt text](image.png)
-![yolo_banner](docs/assets/banner.png)
 <div align="center">
 
 <br>
@@ -312,7 +307,7 @@ YOLO/
 ## Contributors
 
 <a href="https://github.com/Bumblebee-3/YOLO/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Bumblebee-3/YOLO" />
+  <img src="https://contrib.rocks/image?repo=Bumblebee-3/YOLO&idk" />
 </a>
 
 ## Assets and license
