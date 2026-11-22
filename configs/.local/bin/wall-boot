@@ -3,7 +3,15 @@
 LAST_FILE="$HOME/.cache/wallswitch/last"
 
 last=$(cat "$LAST_FILE" 2>/dev/null)
-[[ -f "$last" ]] || last="$HOME/animwall/nissan.gif"
+library="$HOME/.config/yolo/wallpapers"
+case "$last" in
+    "$HOME"/animwall/*|"$HOME"/oledwall/*)
+        migrated="$library/${last#"$HOME"/}"
+        [[ ! -f "$migrated" ]] || last=$migrated
+        ;;
+esac
+[[ -f "$last" ]] || last="$library/animwall/nissan.gif"
+[[ -f "$last" ]] || last="$library/oledwall/eclipse.jpg"
 
 # Paint a lightweight layer before starting the animation daemon. The bundled
 # still also covers the first login, when the preview cache is empty.

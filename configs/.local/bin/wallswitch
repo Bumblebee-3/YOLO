@@ -39,10 +39,10 @@ wallswitch)
 # ── Script modes (called by rofi) ──────────────────────────────
 wallswitch-static|wallswitch-animated)
     if [[ $(basename "$0") == wallswitch-static ]]; then
-        DIR="$HOME/oledwall"
+        DIR="$HOME/.config/yolo/wallpapers/oledwall"
         EXT=(-iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp')
     else
-        DIR="$HOME/animwall"
+        DIR="$HOME/.config/yolo/wallpapers/animwall"
         EXT=(-iname '*.gif')
     fi
 

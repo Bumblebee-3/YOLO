@@ -88,7 +88,7 @@ def main():
             desk, dp = compositor(session, Path(tmp), "desktop", host["WAYLAND_DISPLAY"])
             # A distinct image makes a premature reveal detectable.
             wallpaper = launch(session, desk, "swaybg", "-m", "fill", "-i",
-                               str(repo / "themes/oledwall/ironman.jpg"))
+                               str(repo / "themes/oledwall/eclipse.jpg"))
             wait_for_frame(desk, [dp, wallpaper])
             wait_for_frame(host, [hp, cover], host_frame)
             shutdown(cover)

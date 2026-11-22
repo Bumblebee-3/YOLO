@@ -165,7 +165,7 @@ Checks GitHub every six hours and offers a one-click update in Kitty.
 
 ---
 
-Press `Super + W` to open the picker. Static images live in `~/oledwall`, animated GIFs in `~/animwall`.
+Press `Super + W` to open the picker. Static images live in `~/.config/yolo/wallpapers/oledwall` and animated GIFs in `~/.config/yolo/wallpapers/animwall`. To bring over a personal collection from an older installation, copy its files into the matching folder. Keep any adjacent `.dynsky` directories with their wallpapers.
 
 Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, btop, Fastfetch, GTK 3/4, Qt 5/6, KDE, Hyprland borders, Hyprlock, SDDM, and Firefox (when [pywalfox](https://github.com/Frewacom/pywalfox) is installed).
 

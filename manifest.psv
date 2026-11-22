@@ -1,8 +1,8 @@
 # tier|scope|repository path|destination relative to scope
 core|home|configs/.config|.config
 core|home|configs/.local|.local
-core|home|themes/oledwall|oledwall
-core|home|themes/animwall|animwall
+core|home|themes/oledwall|.config/yolo/wallpapers/oledwall
+core|home|themes/animwall|.config/yolo/wallpapers/animwall
 core|system|system/etc/sddm.conf.d|etc/sddm.conf.d
 core|system|system/etc/sudoers.d|etc/sudoers.d
 core|system|system/usr|usr
