@@ -12,19 +12,23 @@ cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallswitch/previews"
 mkdir -p "$cache"
 key=$(printf '%s' "$wall" | sha256sum)
 preview="$cache/${key%% *}.jpg"
-if [[ ! -s $preview || $wall -nt $preview ]]; then
+if [[ -s $preview && $wall -ot $preview ]]; then
+    awww img "$preview" --filter Bilinear --transition-type none || :
+else
+    # The last lock-screen still is available immediately while FFmpeg prepares
+    # this wallpaper's own first frame in the background.
+    fallback="$HOME/.cache/wallpalette/hyprlock-wall.png"
+    if [[ -s $fallback ]]; then
+        awww img "$fallback" --filter Bilinear --transition-type none || :
+    else
+        awww restore || :
+    fi
     tmp=$(mktemp --suffix=.jpg "$cache/.frame-XXXXXXXX")
-    trap 'rm -f -- "$tmp"' EXIT
     if ffmpeg -nostdin -loglevel error -y -i "$wall" -frames:v 1 \
         -vf "scale='min(1280,iw)':-2" -q:v 3 -update 1 "$tmp"; then
         mv -f -- "$tmp" "$preview"
     else
-        # A failed preview must never prevent the wallpaper itself from loading.
         rm -f -- "$tmp"
-        preview=''
     fi
-fi
-if [[ -s $preview ]]; then
-    awww img "$preview" --filter Bilinear --transition-type none || :
 fi
 exec awww img "$wall" --filter Bilinear --transition-type none

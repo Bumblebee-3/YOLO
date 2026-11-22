@@ -13,7 +13,7 @@ case "$1" in
     case "$(playerctl status 2>/dev/null)" in
         Playing) echo "󰏤" ;;
         Paused)  echo "󰐊" ;;
-        *)       echo "󰐊" ;;
+        *)       ;;
     esac
     ;;
     previous)
