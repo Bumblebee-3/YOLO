@@ -16,14 +16,24 @@ if [[ ${last,,} == *.gif || ! -f $last ]]; then
 fi
 swaybg -m fill -i "$still" &
 still_pid=$!
-awww-daemon --no-cache &
-daemon_pid=$!
-until awww query >/dev/null 2>&1; do
-    kill -0 "$daemon_pid" 2>/dev/null || exit 1
-    sleep 0.05
+if ! awww query >/dev/null 2>&1; then
+    awww-daemon --no-cache &
+fi
+# The IPC socket can answer before Wayland has configured an output.
+# Wait for an actual output and retry the first image submission.
+ready=false
+for ((attempt=0; attempt<200; attempt++)); do
+    if [[ -n $(awww query 2>/dev/null) ]] &&
+        awww img "$still" --filter Bilinear --transition-type none; then
+        ready=true
+        break
+    fi
+    sleep 0.1
 done
-# Keep the temporary layer until awww has its own still on every output.
-awww img "$still" --filter Bilinear --transition-type none || exit 1
+if [[ $ready != true ]]; then
+    printf 'wall-boot: awww could not display the preview; trying the selected wallpaper directly\n' >&2
+    "$HOME/.local/bin/wall-show" "$last" || exit 1
+fi
 kill "$still_pid" 2>/dev/null || :
 [[ -f "$last" ]] || exit 0
 dyn="${last%.*}.dynsky"
