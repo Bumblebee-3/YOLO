@@ -161,15 +161,15 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 <div align="center">
 
-[![accent](https://placehold.co/130x30/0bbfd6/081217?text=accent&font=Oswald)](#wallpapers)
-[![accent2](https://placehold.co/130x30/1194a5/ebf9ff?text=accent2&font=Oswald)](#wallpapers)
-[![highlight](https://placehold.co/130x30/79cdfc/081217?text=highlight&font=Oswald)](#wallpapers)
-[![warn](https://placehold.co/130x30/20c7fc/081217?text=warn&font=Oswald)](#wallpapers)
-[![fg](https://placehold.co/130x30/eef5f6/081217?text=fg&font=Oswald)](#wallpapers)
+[![accent](https://placehold.co/130x30/86b0eb/081217?text=accent&font=Oswald)](#wallpapers)
+[![accent2](https://placehold.co/130x30/4e87d9/f2f4f6?text=accent2&font=Oswald)](#wallpapers)
+[![highlight](https://placehold.co/130x30/d9bfa8/081217?text=highlight&font=Oswald)](#wallpapers)
+[![warn](https://placehold.co/130x30/7fbdfb/081217?text=warn&font=Oswald)](#wallpapers)
+[![fg](https://placehold.co/130x30/f2f4f6/081217?text=fg&font=Oswald)](#wallpapers)
 
 </div>
 
-<sub>Example from the default Northern Lights wallpaper. Every wallpaper generates its own set.</sub>
+<sub>Example from the default Outer Space wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
 <img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
