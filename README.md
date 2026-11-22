@@ -212,10 +212,6 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 <img src="docs/assets/recorder.png"/></td><td>
 <img src="docs/assets/btop_fastfetch.png"/></td></tr></table></div>
 
-<div align="right">
-  <br>
-  <a href="#top"><kbd> <br> 🡅 <br> </kbd></a>
-</div>
 
 <a id="keybindings"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=KEYBINDINGS" width="450"/>
@@ -339,6 +335,18 @@ YOLO/
 
 ### Assets and license
 
+<a id="credits"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=0DB2FF&vCenter=true&width=435&height=25&lines=THANK+YOU!" width="450"/>
+
+YOLO is glued together from a lot of excellent projects.
+
+- [Hyprland](https://github.com/hyprwm/Hyprland), Hyprlock, hyprpm
+- [Hyprgrass](https://github.com/horriblename/hyprgrass) (Bumblebee-3 fork) and [Hyprspace](https://github.com/KZDKM/Hyprspace) (KZDKM)
+- [SwayOSD](https://github.com/ErikReider/SwayOSD) by Erik Reider (Bumblebee-3 fork, vendored)
+- [sddm-astronaut-theme](https://github.com/Keyitdev/sddm-astronaut-theme) by Keyitdev, built on [Sugar Dark](https://github.com/MarianArlt/sddm-sugar-dark) by MarianArlt
+- [Quickshell](https://quickshell.org), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [rofimoji](https://github.com/fdw/rofimoji), [SwayNC](https://github.com/ErikReider/SwayNotificationCenter), [awww](https://codeberg.org/LGFae/awww), [Kitty](https://github.com/kovidgoyal/kitty)
+- [cava](https://github.com/karlstav/cava) and its shaders, including work by rezky_nightky and ChunderFPV
+- [Memoria](https://github.com/Bumblebee-3/memoria) clipboard manager (Bumblebee-3)
 
 #### Wallpaper Credits
 
