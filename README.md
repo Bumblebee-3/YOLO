@@ -1,5 +1,13 @@
 <a id="top"></a>
 
+<p align="center">
+  <img
+    src="assets/banner.png"
+    alt="YOLO — Your Own Linux Overhaul"
+    width="100%"
+  />
+</p>
+
 <div align="center">
 
 <a href="https://github.com/Bumblebee-3/YOLO/stargazers">
@@ -51,7 +59,7 @@
 <br>
 
 <a id="installation"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=INSTALLATION&repeat=false" alt="INSTALLATION" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=INSTALLATION&repeat=false" alt="INSTALLATION" />
 ---
 
 YOLO targets an **x86-64 Arch Linux** install with a working internet connection, a normal user with `sudo`, and `python`. Other distros are not supported, and the installer refuses to run without `/etc/arch-release`.
@@ -98,7 +106,7 @@ Use `./install.sh lower-ram-usage` on a desktop or add it to your existing tiers
 
 
 <a id="features"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=FEATURES&repeat=false" alt="FEATURES" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=FEATURES&repeat=false" alt="FEATURES" />
 ---
 
 <div align="center">
@@ -149,7 +157,7 @@ Checks GitHub every six hours and offers a one-click update in Kitty.
 </div>
 
 <a id="wallpapers"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPERS&repeat=false" alt="WALLPAPERS" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPERS&repeat=false" alt="WALLPAPERS" />
 ---
 
 Press `Super + W` to open the picker. Static images live in `~/.config/yolo/wallpapers/oledwall` and animated GIFs in `~/.config/yolo/wallpapers/animwall`. To bring over a personal collection from an older installation, copy its files into the matching folder. Keep any adjacent `.dynsky` directories with their wallpapers.
@@ -171,7 +179,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 <sub>Example from the default Outer Space wallpaper. Every wallpaper generates its own set.</sub>
 
 <a id="styles"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=STYLES&repeat=false" alt="STYLES" />
 ---
 
 <div align="center">
@@ -219,7 +227,7 @@ Picking one regenerates the palette and re-themes Waybar, Rofi, SwayNC, Kitty, b
 
 
 <a id="keybindings"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=KEYBINDINGS&repeat=false" alt="KEYBINDINGS" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=KEYBINDINGS&repeat=false" alt="KEYBINDINGS" />
 ---
 
 Press `Super + Shift + K` any time to open the keybindings editor. It also opens automatically on your first login.
@@ -243,7 +251,7 @@ Screen recording starts unassigned. Bind `record`, `record-mic`, `record-system`
 
 
 <a id="updating"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=UPDATING&repeat=false" alt="UPDATING" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=UPDATING&repeat=false" alt="UPDATING" />
 ---
 
 YOLO checks GitHub two minutes after login and every six hours after that. Choose **Install update** in the notification to run the updater in Kitty.
@@ -277,7 +285,7 @@ Replace `RUN` with the ID the installer printed. For a broken login screen, swit
 
 
 <a id="contributing"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CONTRIBUTING&repeat=false" alt="CONTRIBUTING" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CONTRIBUTING&repeat=false" alt="CONTRIBUTING" />
 ---
 
 PRs and issues are welcome, whether it is code, testing on different hardware, or docs.
@@ -321,7 +329,7 @@ YOLO/
 
 <br>
 <a id="credits"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CREDITS&repeat=false" alt="CREDITS" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=CREDITS&repeat=false" alt="CREDITS" />
 
 YOLO is glued together from a lot of excellent projects.
 
@@ -335,7 +343,7 @@ YOLO is glued together from a lot of excellent projects.
 
 <br>
 <a id="wallpaper-credits"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPER%20CREDITS&repeat=false" alt="WALLPAPER CREDITS" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=WALLPAPER%20CREDITS&repeat=false" alt="WALLPAPER CREDITS" />
 
 A huge thanks to the photographers and creators whose work helps bring YOLO's desktop to life.
 
@@ -354,7 +362,7 @@ These wallpapers remain the work of their respective creators and are distribute
 
 <br>
 <a id="license"></a>
-<img src="https://readme-typing-svg.demolab.com?font=Iceland&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=LICENSE&repeat=false" alt="LICENSE" />
+<img src="https://readme-typing-svg.demolab.com?font=Fredoka&size=32&pause=1000&color=0DB2FF&vCenter=true&width=435&height=36&duration=1&lines=LICENSE&repeat=false" alt="LICENSE" />
 
 YOLO (Your Own Linux Overhaul) is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
