@@ -1,6 +1,8 @@
 """Copy individual manifest entries atomically, preserving unrelated files."""
 import argparse
 import filecmp
+import hashlib
+import json
 import os
 import re
 import shutil
@@ -88,6 +90,20 @@ def check_parents(path):
             raise ValueError(f"Destination parent is not a directory: {parent}")
 
 
+state_file = root / (".local/state/yolo/deployed.json" if args.scope == "home" else "var/lib/yolo/deployed.json")
+check_parents(state_file)
+if state_file.is_symlink():
+    raise ValueError(f"Unexpected symlink: {state_file}")
+baseline = json.loads(state_file.read_text()) if state_file.exists() else {}
+
+
+def fingerprint(path):
+    if path.is_symlink():
+        return "link:" + os.readlink(path)
+    with path.open("rb") as stream:
+        return f"{stat.S_IMODE(path.stat().st_mode):o}:" + hashlib.file_digest(stream, "sha256").hexdigest()
+
+
 def deploy(name, source):
     dst = root / name
     check_parents(dst)
@@ -104,6 +120,7 @@ def deploy(name, source):
             link = os.readlink(source)
             relative(link)
             if dst.is_symlink() and os.readlink(dst) == link:
+                baseline[str(name)] = fingerprint(dst)
                 return
         elif source.stat().st_size < 2**20:
             raw = source.read_bytes()
@@ -119,6 +136,13 @@ def deploy(name, source):
     owner_ok = not (args.scope == "system" and root == Path("/") and dst.exists()) or dst.lstat().st_uid == 0
     if owner_ok and link is None and dst.is_file() and not dst.is_symlink() and stat.S_IMODE(dst.stat().st_mode) == mode:
         if (data is not None and dst.read_bytes() == data) or (data is None and filecmp.cmp(source, dst, shallow=False)):
+            baseline[str(name)] = fingerprint(dst)
+            return
+    if os.path.lexists(dst):
+        prior = baseline.get(str(name))
+        # The initial SDDM merge retains unrelated settings and enables the greeter.
+        if (prior is not None or source is not None) and prior != fingerprint(dst):
+            print(f"preserve {args.scope}/{name}")
             return
     print(f"{args.scope}/{name}")
     if args.plan:
@@ -146,6 +170,7 @@ def deploy(name, source):
                 old = dst.stat()
                 os.chown(saved, old.st_uid, old.st_gid)
         os.replace(new, dst)
+        baseline[str(name)] = fingerprint(dst)
 
 
 entries = {}
@@ -173,6 +198,12 @@ if args.scope == "system":
             entries[override] = legacy
 for target, source in entries.items():
     deploy(target, source)
+
+if not args.plan:
+    state_file.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", dir=state_file.parent, delete=False) as state:
+        json.dump(baseline, state, sort_keys=True)
+    os.replace(state.name, state_file)
 
 
 # This tier is a run mode. Omitting it on reinstall restores the desktop widgets.

@@ -10,13 +10,14 @@ case "$last" in
         [[ ! -f "$migrated" ]] || last=$migrated
         ;;
 esac
-[[ -f "$last" ]] || last="$library/animwall/nissan.gif"
+[[ -f "$last" ]] || last="$library/oledwall/outer-space.jpg"
 [[ -f "$last" ]] || last="$library/oledwall/eclipse.jpg"
 
 # Paint a lightweight layer before starting the animation daemon. The bundled
 # still also covers the first login, when the preview cache is empty.
 still=/usr/share/sddm/themes/yolo/Backgrounds/login-preview.jpg
 [[ -s $still ]] || still="$HOME/.local/share/yolo/login-wall.jpg"
+[[ $last != "$library/oledwall/outer-space.jpg" ]] || still=$last
 swaybg -m fill -i "$still" &
 still_pid=$!
 if ! awww query >/dev/null 2>&1; then
