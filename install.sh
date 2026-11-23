@@ -2,7 +2,7 @@
 set -euo pipefail
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 for lib in common pkg restore hooks; do source "$repo/lib/$lib.sh"; done
-restore_only=0 plan=0 stage=''
+restore_only=0 plan=0 stage='' circle_binary=''
 tiers=(core)
 while (($#)); do
     case "$1" in
@@ -25,7 +25,10 @@ if (( ! plan )) && [[ -z $stage ]]; then
     flock -n 9 || die 'Another YOLO installation for this user is running'
 fi
 if (( ! restore_only )); then install_packages; fi
-if (( ! restore_only )); then build_yolo_swayosd; fi
+if (( ! restore_only )); then
+    build_circle_search
+    build_yolo_swayosd
+fi
 restore_config
 run_hooks
 if (( ! plan )) && [[ -z $stage && -e $repo/.git ]]; then
@@ -34,7 +37,7 @@ if (( ! plan )) && [[ -z $stage && -e $repo/.git ]]; then
     state_tmp=$(mktemp "$state_dir/update.XXXXXX")
     {
         printf '%s\n' "$repo" "$(git -C "$repo" rev-parse HEAD)"
-        { printf '%s\n' "${tiers[@]}"; if [[ -f $state_dir/update ]]; then tail -n +3 "$state_dir/update"; fi; } | sort -u
+        { printf '%s\n' "${tiers[@]}"; if [[ -f $state_dir/update ]]; then sed '1,2d; /^lower-ram-usage$/d' "$state_dir/update"; fi; } | sort -u
     } > "$state_tmp"
     mv -f "$state_tmp" "$state_dir/update"
     if [[ -n ${WAYLAND_DISPLAY:-} ]]; then

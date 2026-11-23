@@ -59,7 +59,10 @@ YOLO targets an **x86-64 Arch Linux** install with a working internet connection
 
 
 > [!CAUTION]
-> The installer upgrades your system with pacman, switches your display manager to **SDDM** (effective next boot), installs sudo rules for the greeter theme, and builds SwayOSD from source. Your previous display manager and boot target are recorded in `/var/backups/yolo/RUN/service-state.txt` so you can roll back.
+> The installer upgrades your system with pacman, switches your display manager to **SDDM** (effective next boot), installs sudo rules for the greeter theme, and builds SwayOSD and Circle Search from source. Your previous display manager and boot target are recorded in `/var/backups/yolo/RUN/service-state.txt` so you can roll back.
+
+Circle Search uses the host Rust target on a full install. Both the keyboard shortcut and touch keyboard launch `~/.local/bin/circle`. Visual searches require Firefox on PATH. A restore-only run (`-r`) keeps the existing executable.
+
 
 > [!WARNING]
 > The `hw-zenbook` tier is for the matching ASUS Zenbook only (display scaling, stylus, NumberPad, power limits). Leave it off on any other machine.
@@ -87,7 +90,7 @@ Reboot, then pick **YOLO (Hyprland)** in SDDM.
 > | `dev` | git, ShellCheck, StyLua |
 > | `lower-ram-usage` | Removes QuickShell widgets from home screen; reduces ram usage by about 400-500mb. |
 
-Use `./install.sh lower-ram-usage` on a desktop or add it to your existing tiers. The setting takes effect at the next login. With `touch` enabled, the on-screen keyboard remains available from Waybar. Screen recording and touchscreen gestures still work. The SDDM login keyboard is separate from the QuickShell desktop keyboard and remains available at login.
+Use `./install.sh lower-ram-usage` on a desktop or add it to your existing tiers. Reinstall without `lower-ram-usage` (for example, `./install.sh -r core touch`) to restore the widgets. The change takes effect at the next login. With `touch` enabled, the on-screen keyboard remains available from Waybar. Screen recording and touchscreen gestures still work. The SDDM login keyboard is separate from the QuickShell desktop keyboard and remains available at login.
 
 > [!NOTE]
 > Want to see exactly what lands where first? `./install.sh --stage "$PWD/local/preview"` writes a full copy into `local/preview/` without touching your system.
@@ -299,7 +302,7 @@ YOLO/
 ├── profiles/         hw-zenbook, touch, extra
 ├── system/           SDDM theme, session entry, sudoers, libexec
 ├── themes/           oledwall + animwall
-└── vendor/swayosd    pinned SwayOSD fork
+└── vendor/           SwayOSD and Circle Search sources
 ```
 
 </details>

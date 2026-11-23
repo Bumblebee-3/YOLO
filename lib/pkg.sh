@@ -29,6 +29,19 @@ install_packages() {
     "$helper" -S --needed "${community[@]}"
 }
 
+build_circle_search() {
+    if ((plan)) || [[ -n $stage ]]; then
+        log "Build plan: compile Circle Search for the native Rust target and deploy ~/.local/bin/circle."
+        return
+    fi
+    local target build_dir="$repo/local/circle-build"
+    target=$(rustc --print host-tuple)
+    cargo build --locked --release --manifest-path "$repo/vendor/circle-search/Cargo.toml" \
+        --target "$target" --target-dir "$build_dir"
+    circle_binary="$build_dir/$target/release/circle-search"
+    "$circle_binary" --version
+}
+
 build_yolo_swayosd() {
     local build_dir="$repo/vendor/swayosd/build"
     if ((plan)) || [[ -n $stage ]]; then

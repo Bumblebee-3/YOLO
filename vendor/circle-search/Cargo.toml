@@ -1,0 +1,19 @@
+[package]
+name = "circle-search"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+description = "Touch-friendly visual search for Wayland desktops"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+gtk = { package = "gtk4", version = "0.11", features = ["v4_14"] }
+gtk4-layer-shell = "0.8"
+cairo-rs = { version = "0.22", features = ["png"] }
+
+[profile.release]
+strip = true
+lto = "thin"
+

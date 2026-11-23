@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 for option in ("scope", "root", "home", "uid", "run"):
     parser.add_argument("--" + option, required=True)
 parser.add_argument("--plan", action="store_true")
+parser.add_argument("--circle-binary", type=Path)
 parser.add_argument("tiers", nargs="+")
 args = parser.parse_args()
 root = Path(args.root).resolve()
@@ -153,6 +154,8 @@ for line in (repo / "manifest.psv").read_text().splitlines():
     tier, scope, src, dest = line.split("|")
     if tier in args.tiers and scope == args.scope:
         entries.update(files(repo / relative(src), relative(dest)))
+if args.scope == "home" and args.circle_binary:
+    entries[Path(".local/bin/circle")] = args.circle_binary
 if args.scope == "home" and (repo / "local/home").is_dir():
     for child in sorted((repo / "local/home").iterdir()):
         entries.update(files(child, Path(child.name)))
@@ -167,3 +170,21 @@ if args.scope == "system":
             entries[override] = legacy
 for target, source in entries.items():
     deploy(target, source)
+
+
+# This tier is a run mode. Omitting it on reinstall restores the desktop widgets.
+marker = Path(".config/yolo/lower-ram-usage")
+if args.scope == "home" and "lower-ram-usage" not in args.tiers and marker not in entries:
+    dst = root / marker
+    check_parents(dst)
+    if os.path.lexists(dst):
+        if not (dst.is_symlink() or dst.is_file()):
+            raise ValueError(f"Expected a low-RAM marker file: {dst}")
+        print(f"remove home/{marker}")
+        if not args.plan:
+            saved = backup / marker
+            check_parents(saved)
+            backup.mkdir(mode=0o700, parents=True, exist_ok=True)
+            saved.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(dst, saved, follow_symlinks=False)
+            dst.unlink()
