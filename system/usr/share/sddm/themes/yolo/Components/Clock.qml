@@ -13,7 +13,7 @@ Item {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
 
-        font.family: "Inter"
+        font.family: "Inter Black"
         font.pixelSize: root.height * 0.028
         font.weight: Font.Black
 
@@ -33,7 +33,7 @@ Item {
         anchors.topMargin: -root.height * 0.008
         anchors.horizontalCenter: parent.horizontalCenter
 
-        font.family: "Inter"
+        font.family: "Inter Black"
         font.pixelSize: root.height * 0.145
         font.weight: Font.Black
 

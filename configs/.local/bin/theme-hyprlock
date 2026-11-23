@@ -53,6 +53,7 @@ warn = pal["warn"]
 bg = dark_color(accent)
 
 values = {
+    "@YOLO_HOME@": str(home),
     "@WALLPAPER@": wallpaper,
     "@ACCENT@": rgba(accent),
     "@ACCENT_SOFT@": rgba(accent, 0.40),
