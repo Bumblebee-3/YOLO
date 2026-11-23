@@ -47,6 +47,17 @@ else
     fi
 fi
 restore_config
+if (( ! plan )) && [[ -z $stage ]]; then
+    for retired in /usr/share/xsessions/yolo-{handoff,seamless}.desktop \
+        /usr/local/libexec/yolo-{handoff,seamless}/{session.py,libaquamarine.so.15} \
+        /usr/local/libexec/yolo-seamless/handoff-compositor; do
+        if [[ -f $retired ]]; then
+            destination="/var/backups/yolo/$run/retired$retired"
+            sudo mkdir -p -- "${destination%/*}"
+            sudo mv -- "$retired" "$destination"
+        fi
+    done
+fi
 if [[ -n $battery_build ]] && cmp -s "$module/libtahoebattery.so" "$battery_build/image/usr/lib/qt6/qml/TahoeBattery/libtahoebattery.so" && cmp -s "$module/qmldir" "$repo/plugins/TahoeBattery/qmldir"; then
     mkdir -p "${battery_stamp%/*}"
     printf '%s\n' "$battery_key" > "$battery_stamp"

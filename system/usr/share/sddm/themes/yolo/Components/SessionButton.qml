@@ -17,7 +17,11 @@ Item {
 
         visible: false
         model: sessionModel
-        currentIndex: model.lastIndex
+        currentIndex: {
+            if (!count) return -1
+            const nativeSession = find("YOLO (Hyprland)", Qt.MatchExactly)
+            return nativeSession >= 0 ? nativeSession : model.lastIndex
+        }
         textRole: "name"
     }
 
