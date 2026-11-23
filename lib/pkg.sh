@@ -29,6 +29,11 @@ install_packages() {
     "$helper" -S --needed "${community[@]}"
 }
 
+source_key() {
+    (cd "$1" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) |
+        sha256sum | cut -d' ' -f1
+}
+
 build_circle_search() {
     if ((plan)) || [[ -n $stage ]]; then
         log "Build plan: compile Circle Search for the native Rust target and deploy ~/.local/bin/circle."
@@ -36,10 +41,18 @@ build_circle_search() {
     fi
     local target build_dir="$repo/local/circle-build"
     target=$(rustc --print host-tuple)
+    local key stamp="$build_dir/$target/yolo-source"
+    key=$(source_key "$repo/vendor/circle-search")
+    circle_binary="$build_dir/$target/release/circle-search"
+    if [[ -x $circle_binary && -f $stamp && $(<"$stamp") == "$key" ]]; then
+        log "Reusing Circle Search ($target)."
+        return
+    fi
     cargo build --locked --release --manifest-path "$repo/vendor/circle-search/Cargo.toml" \
         --target "$target" --target-dir "$build_dir"
     circle_binary="$build_dir/$target/release/circle-search"
     "$circle_binary" --version
+    printf '%s\n' "$key" > "$stamp"
 }
 
 build_yolo_swayosd() {

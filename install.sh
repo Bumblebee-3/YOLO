@@ -29,16 +29,28 @@ if (( ! restore_only )); then
     build_circle_search
     build_yolo_swayosd
 fi
+battery_build=''
 if (( plan )); then
-    log "Build plan: compile TahoeBattery for the installed Qt 6 and deploy its QML module."
+    log "Build plan: reuse TahoeBattery when source, architecture and Qt match."
 else
+    battery_stamp="${stage:-${XDG_STATE_HOME:-$HOME/.local/state}}/yolo/tahoe-build"
+    battery_key="$(source_key "$repo/plugins/TahoeBattery") $(uname -m) $(pkg-config --modversion Qt6Qml)"
+    module="${stage:+$stage/root}/usr/lib/qt6/qml/TahoeBattery"
+    if [[ -s $module/libtahoebattery.so && -s $module/qmldir && -f $battery_stamp && $(<"$battery_stamp") == "$battery_key" ]]; then
+        log "Reusing installed TahoeBattery."
+    else
     battery_build=$(mktemp -d)
     trap 'rm -rf -- "$battery_build"' EXIT
     cmake -S "$repo/plugins/TahoeBattery" -B "$battery_build" -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
     cmake --build "$battery_build"
     DESTDIR="$battery_build/image" cmake --install "$battery_build"
+    fi
 fi
 restore_config
+if [[ -n $battery_build ]] && cmp -s "$module/libtahoebattery.so" "$battery_build/image/usr/lib/qt6/qml/TahoeBattery/libtahoebattery.so" && cmp -s "$module/qmldir" "$repo/plugins/TahoeBattery/qmldir"; then
+    mkdir -p "${battery_stamp%/*}"
+    printf '%s\n' "$battery_key" > "$battery_stamp"
+fi
 run_hooks
 if (( ! plan )) && [[ -z $stage && -e $repo/.git ]]; then
     state_dir=${XDG_STATE_HOME:-$HOME/.local/state}/yolo
