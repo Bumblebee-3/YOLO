@@ -13,6 +13,8 @@ xdg-utils
 polkit
 sddm
 xorg-server
+qt6-base
+qt6-declarative
 qt6-virtualkeyboard
 qt6-multimedia-ffmpeg
 qt6-svg

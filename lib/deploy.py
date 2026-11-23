@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser()
 for option in ("scope", "root", "home", "uid", "run"):
     parser.add_argument("--" + option, required=True)
 parser.add_argument("--plan", action="store_true")
+parser.add_argument("--battery-image", type=Path)
 parser.add_argument("--circle-binary", type=Path)
 parser.add_argument("tiers", nargs="+")
 args = parser.parse_args()
@@ -160,6 +161,8 @@ if args.scope == "home" and (repo / "local/home").is_dir():
     for child in sorted((repo / "local/home").iterdir()):
         entries.update(files(child, Path(child.name)))
 if args.scope == "system":
+    if args.battery_image:
+        entries.update(files(args.battery_image, Path()))
     entries[Path("etc/sddm.conf")] = None
     theme = Path("usr/share/sddm/themes/yolo")
     override = theme / "theme.conf.user"

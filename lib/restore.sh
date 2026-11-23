@@ -9,6 +9,7 @@ restore_config() {
         if [[ $scope == home && -n ${circle_binary:-} ]]; then generated+=(--circle-binary "$circle_binary"); fi
         root=$home_path
         if [[ $scope == system ]]; then
+            if (( ! plan )); then generated+=(--battery-image "$battery_build/image"); fi
             root=${stage:+$stage/root}
             root=${root:-/}
             if [[ -z $stage ]] && (( ! plan )); then runner=(sudo); fi

@@ -4,6 +4,7 @@ import TahoeBattery 1.0
 Item {
     id: battery
 
+    visible: info.present
     width: 119
     height: 29
 
@@ -14,13 +15,7 @@ Item {
     readonly property real percentage:
         Math.max(0, Math.min(100, info.capacity))
 
-    readonly property bool plugged:
-        info.plugged ||
-        info.status === "Charging" ||
-        info.status === "Full" ||
-        info.status === "Not charging"
-
-    readonly property bool charging: plugged
+    readonly property bool plugged: info.plugged
 
     Canvas {
         id: batteryCanvas
@@ -34,7 +29,7 @@ Item {
                 batteryCanvas.requestPaint()
             }
 
-            function onChargingChanged() {
+            function onPluggedChanged() {
                 batteryCanvas.requestPaint()
             }
         }
@@ -90,7 +85,7 @@ ctx.scale(0.52, 0.52)
 
             if (levelWidth > 0) {
                 var fillColor =
-                    battery.percentage <= 20 && !battery.charging
+                    battery.percentage <= 20 && !battery.plugged
                     ? "rgba(255,95,95,0.96)"
                     : white
 
@@ -103,7 +98,7 @@ ctx.scale(0.52, 0.52)
             }
 
             // Your custom lightning bolt
-            if (battery.charging) {
+            if (battery.plugged) {
                 var points = [
                     [30, 4],
                     [21, 19],

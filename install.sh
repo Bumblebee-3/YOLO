@@ -29,6 +29,15 @@ if (( ! restore_only )); then
     build_circle_search
     build_yolo_swayosd
 fi
+if (( plan )); then
+    log "Build plan: compile TahoeBattery for the installed Qt 6 and deploy its QML module."
+else
+    battery_build=$(mktemp -d)
+    trap 'rm -rf -- "$battery_build"' EXIT
+    cmake -S "$repo/plugins/TahoeBattery" -B "$battery_build" -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake --build "$battery_build"
+    DESTDIR="$battery_build/image" cmake --install "$battery_build"
+fi
 restore_config
 run_hooks
 if (( ! plan )) && [[ -z $stage && -e $repo/.git ]]; then
