@@ -3,13 +3,13 @@
 <div align="center">
 
 <a href="https://github.com/Bumblebee-3/YOLO/stargazers">
-  <img alt="Stars" src="https://img.shields.io/github/stars/Bumblebee-3/YOLO?style=for-the-badge&logo=github&logoColor=081217&label=STARS&labelColor=0db2ff&color=ff7166&idk">
+  <img alt="Stars" src="https://img.shields.io/github/stars/Bumblebee-3/YOLO?style=for-the-badge&logo=github&logoColor=081217&label=STARS&labelColor=4e87d9&color=d9bfa8">
 </a>
 <a href="https://github.com/Bumblebee-3/YOLO/commits/main">
-  <img alt="Last commit" src="https://img.shields.io/github/last-commit/Bumblebee-3/YOLO?style=for-the-badge&logo=git&logoColor=081217&labelColor=0db2ff&color=ff7166">
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/Bumblebee-3/YOLO?style=for-the-badge&logo=git&logoColor=081217&labelColor=4e87d9&color=d9bfa8">
 </a>
 <a href="LICENSE">
-  <img alt="License" src="https://img.shields.io/github/license/Bumblebee-3/YOLO?style=for-the-badge&labelColor=0db2ff&color=ff7166&idk">
+  <img alt="License" src="https://img.shields.io/github/license/Bumblebee-3/YOLO?style=for-the-badge&labelColor=4e87d9&color=d9bfa8">
 </a>
 
 </div>
@@ -19,20 +19,19 @@
 
 <br>
 
-<a href="#installation"><img alt="Installation" src="https://img.shields.io/badge/01-INSTALLATION-081217?style=for-the-badge&labelColor=0db2ff"></a>
-<a href="#features"><img alt="Features" src="https://img.shields.io/badge/02-FEATURES-081217?style=for-the-badge&labelColor=0db2ff"></a>
-<a href="#wallpapers"><img alt="Wallpapers" src="https://img.shields.io/badge/03-WALLPAPERS-081217?style=for-the-badge&labelColor=0db2ff"></a>
-<a href="#styles"><img alt="Styles" src="https://img.shields.io/badge/04-STYLES-081217?style=for-the-badge&labelColor=0db2ff"></a>
+<a href="#installation"><img alt="Installation" src="https://img.shields.io/badge/01-INSTALLATION-081217?style=for-the-badge&labelColor=86b0eb"></a>
+<a href="#features"><img alt="Features" src="https://img.shields.io/badge/02-FEATURES-081217?style=for-the-badge&labelColor=86b0eb"></a>
+<a href="#wallpapers"><img alt="Wallpapers" src="https://img.shields.io/badge/03-WALLPAPERS-081217?style=for-the-badge&labelColor=86b0eb"></a>
+<a href="#styles"><img alt="Styles" src="https://img.shields.io/badge/04-STYLES-081217?style=for-the-badge&labelColor=86b0eb"></a>
 <br>
-<a href="#keybindings"><img alt="Keybindings" src="https://img.shields.io/badge/05-KEYBINDINGS-081217?style=for-the-badge&labelColor=ff7166"></a>
-<a href="#updating"><img alt="Updating" src="https://img.shields.io/badge/06-UPDATING-081217?style=for-the-badge&labelColor=ff7166"></a>
-<a href="#contributing"><img alt="Contributing" src="https://img.shields.io/badge/07-CONTRIBUTING-081217?style=for-the-badge&labelColor=ff7166"></a>
-<a href="#credits"><img alt="Credits" src="https://img.shields.io/badge/08-CREDITS-081217?style=for-the-badge&labelColor=ff7166"></a>
+<a href="#keybindings"><img alt="Keybindings" src="https://img.shields.io/badge/05-KEYBINDINGS-081217?style=for-the-badge&labelColor=d9bfa8"></a>
+<a href="#updating"><img alt="Updating" src="https://img.shields.io/badge/06-UPDATING-081217?style=for-the-badge&labelColor=d9bfa8"></a>
+<a href="#contributing"><img alt="Contributing" src="https://img.shields.io/badge/07-CONTRIBUTING-081217?style=for-the-badge&labelColor=d9bfa8"></a>
+<a href="#credits"><img alt="Credits" src="https://img.shields.io/badge/08-CREDITS-081217?style=for-the-badge&labelColor=d9bfa8"></a>
 
 <br>
 
 </div>
-
 
 
 <div align="center">
@@ -60,6 +59,8 @@ YOLO targets an **x86-64 Arch Linux** install with a working internet connection
 
 > [!CAUTION]
 > The installer upgrades your system with pacman, switches your display manager to **SDDM** (effective next boot), installs sudo rules for the greeter theme, and builds SwayOSD and Circle Search from source. Your previous display manager and boot target are recorded in `/var/backups/yolo/RUN/service-state.txt` so you can roll back.
+
+The SDDM battery indicator builds from `plugins/TahoeBattery` during installation, staging and restore. These modes require CMake, a C++17 compiler and Qt 6 Core/QML development files. The installer deploys the module into the installed Qt's QML directory. The indicator polls Linux power supplies every 30 seconds, displays the first present system battery in name order, and hides when none is present. The lightning bolt indicates external power, including when a charge threshold pauses charging.
 
 Circle Search uses the host Rust target on a full install. Both the keyboard shortcut and touch keyboard launch `~/.local/bin/circle`. Visual searches require Firefox on PATH. A restore-only run (`-r`) keeps the existing executable.
 
