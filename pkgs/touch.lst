@@ -1,8 +1,2 @@
-# Build the touchscreen and overview plugins
-base-devel
-git
-cmake
-meson
-ninja
-cpio
-glm
+# Desktop touchscreen keyboard (wtype is also used by core emoji typing)
+ydotool

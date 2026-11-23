@@ -35,7 +35,10 @@
         "sort-by-number": true
     },
     "custom/osk": {
-        "format": "󰌌",
+        "format": "{}",
+        "exec": "test -f \"$HOME/.config/yolo/touch\" && echo 󰌌",
+        "hide-empty-text": true,
+        "interval": "once",
         "tooltip-format": "Toggle Touch Keyboard",
         "on-click": "qs -p \"$HOME/.config/quickshell/osk.qml\" ipc call osk toggle"
     },

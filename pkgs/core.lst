@@ -52,7 +52,6 @@ fastfetch
 btop
 playerctl
 wtype
-ydotool
 brightnessctl
 pipewire
 pipewire-pulse
@@ -81,3 +80,12 @@ gtk4-layer-shell
 ttf-cascadia-code-nerd
 hunspell-en_us
 python-gobject
+# Clipboard history
+aur:memoria-daemon
+aur:memoria-ui
+# Hyprspace plugin build dependencies
+base-devel
+cmake
+ninja
+cpio
+glm

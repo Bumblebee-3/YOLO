@@ -1,11 +1,18 @@
 #!/bin/bash
+widgets=()
+if [[ ! -e "$HOME/.config/yolo/lower-ram-usage" ]]; then
+    widgets=(clock systemcore nowplaying visualizer)
+fi
+if [[ -e "$HOME/.config/yolo/touch" ]]; then widgets+=(osk); fi
+(( ${#widgets[@]} )) || exit 0
+
 # wait for Hyprland to report the display, then give plugins/waybar a moment to settle
 for i in $(seq 1 200); do
     hyprctl -j monitors 2>/dev/null | jq -e "length > 0" >/dev/null && break
     sleep 0.1
 done
 
-for w in clock systemcore nowplaying visualizer osk; do
+for w in "${widgets[@]}"; do
     ( while true; do
           quickshell -p "$HOME/.config/quickshell/$w.qml"
           sleep 2

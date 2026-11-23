@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
-# Run in a Hyprland session after installing the touch tier.
+# Build the selected plugins inside the running Hyprland session.
 set -euo pipefail
+state="${XDG_STATE_HOME:-$HOME/.local/state}/yolo"
+touch_profile="$HOME/.config/yolo/touch"
+if [[ ${1:-} == --first-run ]]; then
+    if [[ -e "$state/overview-plugin-ready" ]] && { [[ ! -e "$touch_profile" ]] || [[ -e "$state/touch-plugins-ready" ]]; }; then
+        exit 0
+    fi
+    exec kitty --hold -e "$0"
+fi
+mkdir -p "$state"
 hyprctl version >/dev/null
 hyprpm update
 enable_plugin() {
     local name=$1 owner=$2 url=$3 revision=$4 list
     list=$(hyprpm list)
-    if [[ $list != *"Repository $name (by $owner)"* ]]; then
-        if [[ $list == *"Repository $name (by "* ]]; then
+    if [[ ${list,,} != *"repository ${name,,} (by ${owner,,})"* ]]; then
+        if [[ ${list,,} == *"repository ${name,,} (by "* ]]; then
             echo "Another $name repository is registered. Review hyprpm list before switching to $owner." >&2
             return 1
         fi
@@ -15,7 +24,11 @@ enable_plugin() {
     fi
     hyprpm enable "$name"
 }
-enable_plugin hyprgrass Bumblebee-3 https://github.com/Bumblebee-3/hyprgrass 3b311c0e694b299844b34ef7935b5aa08772cd45
 enable_plugin Hyprspace KZDKM https://github.com/KZDKM/Hyprspace 8345bf6f623d486ca3f87f416ccf1412416eef08
+if [[ -e "$touch_profile" ]]; then
+    enable_plugin hyprgrass Bumblebee-3 https://github.com/Bumblebee-3/hyprgrass 3b311c0e694b299844b34ef7935b5aa08772cd45
+fi
 hyprpm reload
 hyprctl reload
+touch "$state/overview-plugin-ready"
+if [[ -e "$touch_profile" ]]; then touch "$state/touch-plugins-ready"; fi

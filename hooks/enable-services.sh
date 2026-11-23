@@ -15,7 +15,7 @@ sudo install -d -m 0700 "$backup"
 sudo systemctl enable --force sddm.service
 sudo systemctl set-default graphical.target
 systemctl --user daemon-reload
-systemctl --user enable ydotool.service
+if [[ -e "$HOME/.config/yolo/touch" ]]; then systemctl --user enable ydotool.service; fi
 # Preserve existing network management on installed desktops.
 if ! systemctl is-enabled --quiet iwd.service && ! systemctl is-enabled --quiet systemd-networkd.service; then
     sudo systemctl enable NetworkManager.service

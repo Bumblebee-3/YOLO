@@ -11,7 +11,7 @@ while (($#)); do
         --stage) shift; [[ -n ${1:-} ]] || die 'Missing staging path'; stage=$(realpath -m -- "$1") ;;
         -h|--help) usage; exit ;;
         core) ;;
-        extra|dev|touch|hw-zenbook) [[ " ${tiers[*]} " == *" $1 "* ]] || tiers+=("$1") ;;
+        extra|dev|touch|hw-zenbook|lower-ram-usage) [[ " ${tiers[*]} " == *" $1 "* ]] || tiers+=("$1") ;;
         *) die "Unknown option or tier: $1" ;;
     esac
     shift

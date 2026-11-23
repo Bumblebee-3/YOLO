@@ -10,5 +10,6 @@ hw-zenbook|home|profiles/hw-zenbook/hypr/zenbook.lua|.config/hypr/zenbook.lua
 hw-zenbook|home|profiles/hw-zenbook/hypr/powermode.sh|.config/hypr/scripts/powermode.sh
 hw-zenbook|system|profiles/hw-zenbook/zenbook-power-write|usr/local/libexec/zenbook-power-write
 hw-zenbook|system|profiles/hw-zenbook/yolo-zenbook|etc/sudoers.d/yolo-zenbook
-touch|home|profiles/touch/setup-gestures|.local/bin/yolo-setup-gestures
-extra|home|profiles/extra/memoria.toml|.config/memoria/config.toml
+touch|home|profiles/touch/osk.qml|.config/quickshell/osk.qml
+touch|home|profiles/touch/touch|.config/yolo/touch
+lower-ram-usage|home|profiles/lower-ram-usage/enabled|.config/yolo/lower-ram-usage

@@ -1,7 +1,0 @@
-#!/bin/sh
-set -eu
-state="${XDG_STATE_HOME:-$HOME/.local/state}/yolo"
-mkdir -p "$state"
-test ! -e "$state/touch-plugins-ready" || exit 0
-"$HOME/.local/bin/yolo-plugins"
-touch "$state/touch-plugins-ready"

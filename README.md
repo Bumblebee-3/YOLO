@@ -80,11 +80,14 @@ Reboot, then pick **YOLO (Hyprland)** in SDDM.
 >
 > | Tier | Adds |
 > |---|---|
-> | `core` | Always on. Desktop, greeter, widgets, OSK, wallpapers, recording tools |
-> | `touch` | Hyprgrass gestures + Hyprspace overview |
+> | `core` | Always on. Desktop, greeter, widgets, wallpapers, recording tools, Hyprspace overview (three-finger touchpad swipe up or Super + Tab), Memoria clipboard (Super + V) |
+> | `touch` | Hyprgrass gestures and the desktop on-screen keyboard |
 > | `hw-zenbook` | Zenbook-only profile (Do not use unless you have ux3405CA spec ultra 9 285H, Has specialised power modes for this system, that could potentially break your laptop.) |
-> | `extra` | KDE Connect, scrcpy, Android tools, Memoria clipboard |
+> | `extra` | KDE Connect, scrcpy, Android tools |
 > | `dev` | git, ShellCheck, StyLua |
+> | `lower-ram-usage` | Removes QuickShell widgets from home screen; reduces ram usage by about 400-500mb. |
+
+Use `./install.sh lower-ram-usage` on a desktop or add it to your existing tiers. The setting takes effect at the next login. With `touch` enabled, the on-screen keyboard remains available from Waybar. Screen recording and touchscreen gestures still work. The SDDM login keyboard is separate from the QuickShell desktop keyboard and remains available at login.
 
 > [!NOTE]
 > Want to see exactly what lands where first? `./install.sh --stage "$PWD/local/preview"` writes a full copy into `local/preview/` without touching your system.

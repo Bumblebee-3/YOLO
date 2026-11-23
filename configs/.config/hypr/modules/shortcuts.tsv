@@ -12,6 +12,7 @@ open-file-manager	Open file manager	SUPER + E
 change-wallpaper	Change wallpaper	SUPER + W
 open-kde-connect	Open KDE Connect	SUPER + SHIFT + M
 toggle-floating	Toggle floating	SUPER + U
+open-workspace-overview	Open workspace overview	SUPER + Tab
 open-clipboard-history	Open clipboard history	SUPER + V
 pick-emoji	Pick emoji	SUPER + period
 open-application-launcher	Open application launcher	SUPER + A
