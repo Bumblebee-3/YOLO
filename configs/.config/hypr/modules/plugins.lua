@@ -7,7 +7,7 @@ local plugin_cfg = {
         long_press_delay = 400,
         edge_margin = 10,
         resize_on_border_long_press = true,
-        excluded_layer_namespaces = "osk, rofi",
+        excluded_layer_namespaces = "osk, rofi, yolo-control",
     },
     overview = {
         panelHeight = 180,

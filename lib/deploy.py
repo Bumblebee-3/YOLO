@@ -143,7 +143,7 @@ def deploy(name, source):
         # The initial SDDM merge retains unrelated settings and enables the greeter.
         built_binary = (args.circle_binary is not None and source == args.circle_binary) or (
             args.battery_image is not None and name == Path("usr/lib/qt6/qml/TahoeBattery/libtahoebattery.so"))
-        if not built_binary and (prior is not None or source is not None) and prior != fingerprint(dst):
+        if not built_binary and prior is not None and prior != fingerprint(dst):
             print(f"preserve {args.scope}/{name}")
             return
     print(f"{args.scope}/{name}")

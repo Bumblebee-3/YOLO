@@ -12,6 +12,7 @@ ShellRoot {
 WallPalette { id: pal }
 PanelWindow {
 id: panel
+visible: false
 anchors { top: true; bottom: true; left: true; right: true }
 color: "transparent"
 exclusionMode: ExclusionMode.Ignore
@@ -31,6 +32,7 @@ readonly property var player: Mpris.players.values.find(p => p.isPlaying) ?? Mpr
 readonly property real ui: Math.max(0.8, Math.min(1, screen.height * 0.2 / 240))
 property string picker: ""
 property bool closing: false
+property var afterClose: null
 function fmtTime(sec) {
 const s = Math.max(0, Math.floor(sec || 0))
 const m = Math.floor(s / 60)
@@ -39,14 +41,16 @@ return m + ":" + (r < 10 ? "0" : "") + r
 }
 function openPanel() {
 closeTimer.stop()
+afterClose = null
 closing = false
 visible = true
 seekRow.livePos = player?.position ?? 0
 }
 
-function closePanel() {
+function closePanel(afterClose) {
 if (!visible || closing) return
 closing = true
+panel.afterClose = afterClose || null
 closeTimer.start()
 }
 
@@ -57,6 +61,9 @@ onTriggered: {
 panel.visible = false
 panel.closing = false
 panel.picker = ""
+const callback = panel.afterClose
+panel.afterClose = null
+if (callback) callback()
 }
 }
 
@@ -120,25 +127,49 @@ component SquareTile: Button {
 id: tile
 required property string label
 required property int glyph
+property string iconText: ""
 property bool active: false
+property color activeColor: panel.primary
+property color inactiveColor: pal.fg
+property color activeFill: Qt.alpha(pal.fg, 0.12)
+property bool tintWhenInactive: false
+property bool longPressEnabled: false
+property bool longPressTriggered: false
+signal longHeld()
 implicitWidth: 68*panel.ui
 implicitHeight: implicitWidth
 Accessible.name: label
+hoverEnabled: true
+Timer {
+    id: holdTimer
+    interval: 1000
+    onTriggered: {
+        if (!tile.longPressEnabled || !tile.pressed) return
+        tile.longPressTriggered = true
+        tile.longHeld()
+    }
+}
+onPressed: {
+    longPressTriggered = false
+    if (longPressEnabled) holdTimer.start()
+}
+onReleased: holdTimer.stop()
+onCanceled: holdTimer.stop()
 scale: down ? 0.96 : 1
 Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutBack } }
 opacity: enabled ? 1 : 0.38
 background: Item {
 Rectangle {
 anchors.fill: parent; anchors.margins: -4
-radius: 15; color: Qt.alpha(panel.primary, 0.14)
+radius: 15; color: Qt.alpha(tile.activeColor, 0.14)
 opacity: tile.active ? 1 : 0
 Behavior on opacity { NumberAnimation { duration: 140 } }
 }
 Rectangle {
 anchors.fill: parent; radius: 15
-color: Qt.alpha(pal.fg, tile.active ? 0.12 : 0.06)
+color: tile.active ? tile.activeFill : Qt.alpha(pal.fg, 0.06)
 border.width: tile.active ? 2 : 1
-border.color: tile.active ? panel.primary : Qt.alpha(pal.fg, 0.14)
+border.color: tile.active ? tile.activeColor : Qt.alpha(pal.fg, 0.14)
 Behavior on color { ColorAnimation { duration: 150 } }
 Behavior on border.color { ColorAnimation { duration: 150 } }
 }
@@ -148,7 +179,8 @@ spacing: 3
 topPadding: Math.max(0, (height - symbol.height) / 2)
 Text { id: symbol; anchors.horizontalCenter: parent.horizontalCenter
 font.family: panel.icons; font.pixelSize: 25*panel.ui
-color: tile.active ? panel.primary : pal.fg; text: String.fromCodePoint(tile.glyph) }
+color: tile.active || tile.tintWhenInactive ? tile.activeColor : tile.inactiveColor
+text: tile.iconText || String.fromCodePoint(tile.glyph) }
 }
 }
 component RadioTile: SquareTile {
@@ -160,7 +192,10 @@ stdout: StdioCollector { onStreamFinished: radio.active = text.trim() === "true"
 Timer { interval: 2500; repeat: true; running: panel.visible; triggeredOnStart: true
 onTriggered: if (!write.running) read.running = true }
 Process { id: write; onExited: read.running = true }
-onClicked: write.exec(["env", "SWAYNC_TOGGLE_STATE=" + !active, panel.helper, control, "set"])
+onClicked: {
+    if (radio.longPressTriggered) return
+    write.exec(["env", "SWAYNC_TOGGLE_STATE=" + !active, panel.helper, control, "set"])
+}
 }
 component HSlider: Rectangle {
 id: pill
@@ -198,10 +233,13 @@ required property bool output
 readonly property string title: output ? "Output" : "Input"
 readonly property var node: output ? panel.sink : panel.mic
 readonly property bool expanded: panel.picker === title
-spacing: 6
+visible: panel.picker === "" || row.expanded
+Layout.fillHeight: row.expanded
+Layout.minimumHeight: header.implicitHeight
+spacing: 4 * panel.ui
 Button {
 id: header
-Layout.fillWidth: true; implicitHeight: 44
+Layout.fillWidth: true; implicitHeight: 40 * panel.ui
 Accessible.name: row.title + " device"
 background: Card { radius: 15}
 onClicked: panel.picker = row.expanded ? "" : row.title
@@ -216,16 +254,18 @@ ListView {
 id: devices
 visible: row.expanded
 Layout.fillWidth: true
-Layout.preferredHeight: Math.min(116 * panel.ui, Math.max(36, count * 38))
-spacing: 4
+Layout.fillHeight: true
+Layout.minimumHeight: 0
+Layout.preferredHeight: 100 * panel.ui
+spacing: 2 * panel.ui
 clip: true
 model: row.expanded ? Pipewire.nodes.values.filter(n => n.audio && !n.isStream && n.isSink === row.output) : []
 Caption { anchors.centerIn: parent; visible: !devices.count; text: "No devices available" }
 delegate: Button {
 required property var modelData
-width: devices.width; height: 34
-leftPadding: 14; rightPadding: 14
-background: Card { radius: 15}
+width: devices.width; height: 30 * panel.ui
+leftPadding: 12 * panel.ui; rightPadding: 12 * panel.ui
+background: Card { radius: 10 * panel.ui}
 contentItem: Caption {
 verticalAlignment: Text.AlignVCenter
 text: modelData.nickname || modelData.description || modelData.name
@@ -270,7 +310,7 @@ transform: Translate { y: -(surface.height + 24) * (1 - surface.appear) }
 MouseArea { anchors.fill: parent }
 Flickable {
 id: viewport
-anchors.fill: parent; anchors.margins: 16*panel.ui; anchors.bottomMargin: 30*panel.ui
+anchors.fill: parent; anchors.margins: 16*panel.ui
 contentWidth: strip.width; contentHeight: height; clip: true
 RowLayout {
 id: strip; height: viewport.height; width: Math.max(viewport.width, 1190*panel.ui)
@@ -384,24 +424,89 @@ opacity: 0.85
 }
 Grid {
 columns: 4; spacing: 15*panel.ui
-RadioTile { control: "wifi"; label: "Wi-Fi"; glyph: 0xf05a9 }
+RadioTile {
+control: "wifi"; label: "Wi-Fi"; glyph: 0xf05a9
+longPressEnabled: true
+onLongHeld: panel.closePanel(() => wifiManager.running = true)
+Process { id: wifiManager; command: [panel.bin+"yolo-manager-current", "wifi"]
+onExited: (exitCode) => {
+    if (exitCode !== 0) console.warn("Control panel: Wi-Fi manager restart failed with exit code", exitCode)
+} }
+}
 RadioTile { control: "airplane"; label: "AIRPLANE"; glyph: 0xf001d }
-SquareTile { label: "Bluetooth"; glyph: 0xf00af; enabled: !!Bluetooth.defaultAdapter
+SquareTile {
+id: bluetooth
+label: "Bluetooth"; glyph: 0xf00af; enabled: !!Bluetooth.defaultAdapter
 active: Bluetooth.defaultAdapter?.enabled ?? false
-onClicked: Bluetooth.defaultAdapter.enabled = !active }
+longPressEnabled: true
+onLongHeld: panel.closePanel(() => bluetoothManager.running = true)
+Process { id: bluetoothManager; command: [panel.bin+"yolo-manager-current", "bluetooth"]
+onExited: (exitCode) => {
+    if (exitCode !== 0) console.warn("Control panel: Bluetooth manager restart failed with exit code", exitCode)
+} }
+onClicked: {
+    if (bluetooth.longPressTriggered) return
+    Bluetooth.defaultAdapter.enabled = !bluetooth.active
+}
+}
 SquareTile {
 id: power
-property string mode: ""
-label: "POWER"; ToolTip.visible: hovered; ToolTip.text: mode; glyph: 0xf0a0f; active: !!mode && mode !== "balanced" && mode !== "normal"
+property string modeClass: ""
+property string tooltipText: ""
+property color modeColor: modeClass === "powersave" ? "#64ffc8"
+    : modeClass === "performance" ? "#ff2d55" : "#00d2ff"
+label: "POWER"; ToolTip.visible: hovered; ToolTip.text: tooltipText; glyph: 0xf0a0f
+activeColor: modeColor; tintWhenInactive: true
 enabled: !powerWrite.running
 Process { id: powerRead; command: [panel.bin+"yolo-power","get"]
-stdout: StdioCollector { onStreamFinished: { try { power.mode = JSON.parse(text).class || "" } catch (e) { power.mode = "" } } } }
+stdout: StdioCollector { onStreamFinished: {
+    try {
+        const state = JSON.parse(text)
+        const classes = Array.isArray(state.class) ? state.class : [state.class]
+        power.modeClass = String(classes[0] || "")
+        power.iconText = String(state.text || "")
+        power.tooltipText = String(state.tooltip || power.modeClass)
+    } catch (e) {
+        console.warn("Control panel: could not read power-mode state:", e)
+    }
+} } }
 Timer { interval: 2500; triggeredOnStart: true; repeat: true; running: panel.visible
 onTriggered: if (!powerWrite.running) powerRead.running = true }
-Process { id: powerWrite; command: [panel.helper,"power","set"]; onExited: powerRead.running = true }
+Process { id: powerWrite; command: [panel.bin+"yolo-power","toggle"]
+onExited: (exitCode) => {
+    if (exitCode !== 0) console.warn("Control panel: power-mode toggle failed with exit code", exitCode)
+    powerRead.running = true
+} }
 onClicked: powerWrite.running = true
 }
-RadioTile { control: "lid"; label: "AWAKE"; glyph: 0xf0322 }
+SquareTile {
+id: lidToggle
+property string tooltipText: ""
+label: "LID SLEEP"; glyph: 0xf0322
+activeColor: "#0db2ff"; inactiveColor: "#ebf9ff"
+activeFill: Qt.alpha("#0db2ff", 0.10)
+ToolTip.visible: hovered; ToolTip.text: tooltipText
+enabled: !lidWrite.running
+Process { id: lidRead; command: [panel.bin+"lidtoggle","waybar"]
+stdout: StdioCollector { onStreamFinished: {
+    try {
+        const state = JSON.parse(text)
+        lidToggle.active = state.class === "enabled"
+        lidToggle.iconText = String(state.text || "")
+        lidToggle.tooltipText = String(state.tooltip || "")
+    } catch (e) {
+        console.warn("Control panel: could not read lid-toggle state:", e)
+    }
+} } }
+Timer { interval: 2500; repeat: true; running: panel.visible; triggeredOnStart: true
+onTriggered: if (!lidWrite.running) lidRead.running = true }
+Process { id: lidWrite; command: [panel.bin+"lidtoggle","toggle"]
+onExited: (exitCode) => {
+    if (exitCode !== 0) console.warn("Control panel: lid-toggle failed with exit code", exitCode)
+    lidRead.running = true
+} }
+onClicked: lidWrite.running = true
+}
 SquareTile { label: "MUTE SPK"; enabled: !!panel.sink?.audio; active: panel.sink?.audio?.muted ?? false
 glyph: active ? 0xf0581 : 0xf057e; onClicked: panel.sink.audio.muted = !active }
 SquareTile { label: "MUTE MIC"; enabled: !!panel.mic?.audio; active: panel.mic?.audio?.muted ?? false
@@ -420,6 +525,7 @@ ColumnLayout {
 Layout.fillWidth: true
 Layout.preferredWidth: 260 * panel.ui
 Layout.alignment: Qt.AlignHCenter
+Layout.fillHeight: true
 spacing: 8 * panel.ui
 DeviceRow { Layout.fillWidth: true; output: true }
 DeviceRow { Layout.fillWidth: true; output: false }

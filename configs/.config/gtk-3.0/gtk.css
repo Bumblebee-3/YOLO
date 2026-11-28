@@ -42,7 +42,41 @@ headerbar, .titlebar {
     color: #ebf9ff;
 }
 
+toolbar, .toolbar, menubar, .menubar {
+    background-color: #172126;
+    color: #ebf9ff;
+}
+
+toolbar button, .toolbar button, toolbutton, modelbutton {
+    background-color: transparent;
+    color: #ebf9ff;
+}
+
+toolbar button:hover, .toolbar button:hover, toolbutton:hover, modelbutton:hover {
+    background-color: #232e33;
+}
+
 entry, textview text, treeview.view {
+    background-color: #060e11;
+    color: #ebf9ff;
+}
+
+menu, .menu, popover, popover > contents {
+    background-color: #172126;
+    color: #ebf9ff;
+}
+
+menuitem, modelbutton {
+    background-color: transparent;
+    color: #ebf9ff;
+}
+
+menuitem:hover, menuitem:selected, modelbutton:hover, modelbutton:selected {
+    background-color: #0db2ff;
+    color: #081217;
+}
+
+.view, listview, columnview, .navigation-sidebar {
     background-color: #060e11;
     color: #ebf9ff;
 }

@@ -215,7 +215,41 @@ headerbar, .titlebar {{
     color: {fg};
 }}
 
+toolbar, .toolbar, menubar, .menubar {{
+    background-color: {surface};
+    color: {fg};
+}}
+
+toolbar button, .toolbar button, toolbutton, modelbutton {{
+    background-color: transparent;
+    color: {fg};
+}}
+
+toolbar button:hover, .toolbar button:hover, toolbutton:hover, modelbutton:hover {{
+    background-color: {raised};
+}}
+
 entry, textview text, treeview.view {{
+    background-color: {input_bg};
+    color: {fg};
+}}
+
+menu, .menu, popover, popover > contents {{
+    background-color: {surface};
+    color: {fg};
+}}
+
+menuitem, modelbutton {{
+    background-color: transparent;
+    color: {fg};
+}}
+
+menuitem:hover, menuitem:selected, modelbutton:hover, modelbutton:selected {{
+    background-color: {accent};
+    color: {selection_text};
+}}
+
+.view, listview, columnview, .navigation-sidebar {{
     background-color: {input_bg};
     color: {fg};
 }}

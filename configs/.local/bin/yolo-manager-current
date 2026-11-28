@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+kind=${1:-}
+case "$kind" in
+    wifi) launch=("$HOME/.local/bin/yolo-wifi") ;;
+    bluetooth) launch=(blueman-manager) ;;
+    *)
+        printf 'Usage: %s {wifi|bluetooth}\n' "${0##*/}" >&2
+        exit 2
+        ;;
+esac
+
+matching_addresses() {
+    jq -r --arg kind "$kind" '
+        def matches($kind):
+            ((.class // "") | ascii_downcase) as $class
+            | (((.title // "") + " " + (.initialTitle // "")) | ascii_downcase) as $title
+            | if $kind == "wifi" then
+                (["yolo-wifi", "iwgtk", "org.twosheds.iwgtk", "nm-applet", "nm-connection-editor", "nmtui", "iwctl"] | index($class)) != null
+                or ($class == "kitty" and ($title | test("nmtui|iwctl")))
+              else
+                ($class | startswith("blueman-"))
+              end;
+        .[] | select(matches($kind)) | .address
+    '
+}
+
+clients=$(hyprctl -j clients)
+addresses=$(matching_addresses <<< "$clients")
+if [[ -n "$addresses" ]]; then
+    workspace=$(hyprctl -j activeworkspace | jq -er '.id | tostring')
+    focus_address=""
+    while IFS= read -r address; do
+        [[ -n "$address" ]] || continue
+        hyprctl eval "hl.dispatch(hl.dsp.window.move({ window = 'address:$address', workspace = '$workspace', follow = false }))" >/dev/null
+        [[ -n "$focus_address" ]] || focus_address=$address
+    done <<< "$addresses"
+    hyprctl eval "hl.dispatch(hl.dsp.focus({ window = 'address:$focus_address' }))" >/dev/null
+    exit 0
+fi
+
+exec "${launch[@]}"
