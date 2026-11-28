@@ -1,4 +1,5 @@
 -- Keep the greeter still opaque and above the daemon until its first image is ready.
+hl.layer_rule({ match = { namespace = "^yolo-control$" }, blur = true, ignore_alpha = 0.1 })
 hl.layer_rule({ match = { namespace = "^wallpaper$" }, no_anim = true, order = 10 })
 hl.layer_rule({ match = { namespace = "^awww-daemon.*$" }, no_anim = true })
 

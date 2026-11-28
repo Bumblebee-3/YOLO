@@ -1,5 +1,6 @@
 local shortcuts = require("modules.shortcuts")
 local bind = shortcuts.bind
+bind("open-control-center", hl.dsp.exec_cmd("qs -n -p ~/.config/quickshell/control.qml"))
 
 bind("switch-tiling-layout", function()
     -- Read the current layout setting

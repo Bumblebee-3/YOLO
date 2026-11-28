@@ -1,8 +1,9 @@
+
 -- plugin settings: only applied once the plugin is actually loaded, so there is
 -- no "unknown option" error flash while Hyprland starts up before hyprpm has run
 local plugin_cfg = {
     hyprgrass = {
-        sensitivity = 5.0,
+        sensitivity = 8.0,
         long_press_delay = 400,
         edge_margin = 10,
         resize_on_border_long_press = true,
@@ -24,9 +25,9 @@ local plugin_cfg = {
         exitOnClick = true,
         exitOnSwitch = true,
         disableGestures = false,
-        workspaceActiveBackground = "rgba(0db2ff2e)",
-        workspaceInactiveBackground = "rgba(081217d9)",
-        workspaceActiveBorder = "rgba(0db2ffff)",
+        workspaceActiveBackground = "rgba(86b0eb2e)",
+        workspaceInactiveBackground = "rgba(080e17d9)",
+        workspaceActiveBorder = "rgba(86b0ebff)",
         dragAlpha = 0.85,
         disableBlur = false,
     },
@@ -118,4 +119,27 @@ hl.plugin.hyprgrass.bind {
 hl.plugin.hyprgrass.bind {
     pattern = { kind = "edge", origin = "d", direction = "d" },
     action = function() if hl.plugin.overview then hl.plugin.overview.close() end end,
+}
+
+
+-- Control Centre: swipe down from the top edge to open
+
+
+-- Control Centre: swipe up towards the top edge to close
+
+
+-- Control Centre: open
+hl.plugin.hyprgrass.bind {
+    pattern = { kind = "edge", origin = "u", direction = "d" },
+    action = hl.dsp.exec_cmd(
+        "qs ipc -p ~/.config/quickshell/control.qml call control open"
+    ),
+}
+
+-- Control Centre: close
+hl.plugin.hyprgrass.bind {
+    pattern = { kind = "edge", origin = "u", direction = "u" },
+    action = hl.dsp.exec_cmd(
+        "qs ipc -p ~/.config/quickshell/control.qml call control close"
+    ),
 }
